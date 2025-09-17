@@ -974,9 +974,16 @@ const Transactions = () => {
                         <span className="text-lg">{category.icon}</span>
                       </div>
                     <div className="flex-1 min-w-0">
-                      <h4 className="text-sm font-semibold text-gray-900 truncate">
-                        {category.name}
-                      </h4>
+                      <div className="flex items-center justify-between">
+                        <h4 className="text-sm font-semibold text-gray-900 truncate">
+                          {category.name}
+                        </h4>
+                        <div className={`text-sm font-semibold ${
+                          transaction.type === 'receita' ? 'text-green-600' : 'text-red-600'
+                        }`}>
+                          {transaction.type === 'receita' ? '+' : '-'}R$ {transaction.totalAmount.toFixed(2)}
+                        </div>
+                      </div>
                       <p className="text-xs text-gray-500">{transaction.description || ''}</p>
                     </div>
                   </div>
@@ -1007,11 +1014,6 @@ const Transactions = () => {
                           ? 'Parcial'
                           : 'Pendente'}
                       </button>
-                    </div>
-                    <div className={`text-sm font-semibold ${
-                      transaction.type === 'receita' ? 'text-green-600' : 'text-red-600'
-                    }`}>
-                      {transaction.type === 'receita' ? '+' : '-'}R$ {transaction.totalAmount.toFixed(2)}
                     </div>
                   </div>
                   
@@ -1073,9 +1075,16 @@ const Transactions = () => {
                     <span className="text-lg">{category.icon}</span>
                   </div>
                   <div className="flex-1 min-w-0">
-                    <h4 className="text-sm font-semibold text-gray-900 truncate">
-                      {category.name}
-                    </h4>
+                    <div className="flex items-center justify-between">
+                      <h4 className="text-sm font-semibold text-gray-900 truncate">
+                        {category.name}
+                      </h4>
+                      <div className={`text-sm font-semibold ${
+                        transaction.type === 'receita' ? 'text-green-600' : 'text-red-600'
+                      }`}>
+                        {transaction.type === 'receita' ? '+' : '-'}R$ {transaction.amount.toFixed(2)}
+                      </div>
+                    </div>
                     <p className="text-xs text-gray-500">{transaction.description || ''}</p>
                   </div>
                 </div>
@@ -1099,11 +1108,6 @@ const Transactions = () => {
                     >
                       {transaction.isPaid ? 'Pago' : 'Pendente'}
                     </button>
-                  </div>
-                  <div className={`text-sm font-semibold ${
-                    transaction.type === 'receita' ? 'text-green-600' : 'text-red-600'
-                  }`}>
-                    {transaction.type === 'receita' ? '+' : '-'}R$ {transaction.amount.toFixed(2)}
                   </div>
                 </div>
                 
