@@ -1,0 +1,436 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Color Picker Styles */
+.colWidgJsTools {
+  font-family: Arial, sans-serif;
+}
+
+.cont-col1-widg-color {
+  position: relative;
+  display: inline-block;
+}
+
+.cp-out-container {
+  position: relative;
+}
+
+.sp-container {
+  position: relative;
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: 10px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.sp-palette-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.sp-palette {
+  width: 32px;
+  height: 32px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.sp-palette-button-container {
+  display: flex;
+  align-items: center;
+}
+
+.sp-palette-toggle {
+  background: #f8f9fa;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 4px 8px;
+  font-size: 12px;
+  cursor: pointer;
+  color: #333;
+}
+
+.sp-palette-toggle:hover {
+  background: #e9ecef;
+}
+
+.sp-picker-container {
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 15px;
+  margin-top: 10px;
+}
+
+.sp-top {
+  position: relative;
+  margin-bottom: 15px;
+}
+
+.sp-top-inner {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.sp-color {
+  width: 200px;
+  height: 150px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  cursor: crosshair;
+  position: relative;
+  overflow: hidden;
+}
+
+.sp-sat {
+  position: absolute;
+  inset: 0;
+}
+
+.sp-val {
+  position: absolute;
+  inset: 0;
+}
+
+.sp-dragger {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  background: #fff;
+  border: 2px solid #333;
+  border-radius: 50%;
+  pointer-events: none;
+  box-shadow: 0 0 5px rgba(0,0,0,0.3);
+  transform: translate(-50%, -50%);
+}
+
+.sp-hue {
+  position: relative;
+  width: 25px;
+  height: 150px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background: linear-gradient(to top, #ff0000, #ff8000, #ffff00, #80ff00, #00ff00, #00ff80, #00ffff, #0080ff, #0000ff, #8000ff, #ff00ff, #ff0080);
+  cursor: pointer;
+}
+
+.sp-slider {
+  position: absolute;
+  width: 100%;
+  height: 8px;
+  background: #fff;
+  border: 1px solid #666;
+  border-radius: 4px;
+  pointer-events: none;
+  box-shadow: 0 0 3px rgba(0,0,0,0.3);
+  transform: translateY(-50%);
+}
+
+.sp-alpha {
+  margin-top: 10px;
+}
+
+.sp-alpha-inner {
+  position: relative;
+  height: 25px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background: linear-gradient(to right, transparent, #000);
+}
+
+.sp-alpha-handle {
+  position: absolute;
+  width: 12px;
+  height: 25px;
+  background: #fff;
+  border: 1px solid #666;
+  border-radius: 2px;
+  pointer-events: none;
+  box-shadow: 0 0 3px rgba(0,0,0,0.3);
+  transform: translateX(-50%);
+}
+
+.sp-input-container {
+  margin: 15px 0;
+}
+
+.sp-input {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+  background: #fff;
+}
+
+.sp-button-container {
+  display: flex;
+  gap: 10px;
+  margin-top: 15px;
+}
+
+.sp-cancel {
+  padding: 8px 16px;
+  background: #f8f9fa;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  color: #333;
+  text-decoration: none;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.sp-cancel:hover {
+  background: #e9ecef;
+}
+
+.sp-choose {
+  padding: 8px 16px;
+  background: #007bff;
+  border: 1px solid #007bff;
+  border-radius: 4px;
+  color: #fff;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.sp-choose:hover {
+  background: #0056b3;
+}
+
+.cp-hex {
+  margin-top: 15px;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  text-align: center;
+  color: #fff;
+}
+
+.cp-hex span {
+  display: block;
+  font-size: 12px;
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.cp-hex-h {
+  width: 100%;
+  padding: 5px;
+  border: none;
+  border-radius: 2px;
+  background: rgba(255,255,255,0.9);
+  color: #333;
+  font-family: monospace;
+  font-size: 12px;
+  text-align: center;
+}
+
+@layer base {
+  html {
+    font-family: 'Inter', system-ui, sans-serif;
+    overflow-x: hidden;
+  }
+  
+  body {
+    overflow-x: hidden;
+    max-width: 100vw;
+  }
+  
+  * {
+    box-sizing: border-box;
+  }
+  
+  /* Melhorias de responsividade */
+  @media (max-width: 640px) {
+    .container {
+      padding-left: 1rem;
+      padding-right: 1rem;
+    }
+    
+    /* Garantir que o conteúdo não fique atrás da bottom navigation */
+    body {
+      padding-bottom: 0;
+    }
+  }
+  
+  /* Safe area para dispositivos com notch */
+  @supports (padding: max(0px)) {
+    .mobile-bottom-nav {
+      padding-bottom: max(0.5rem, env(safe-area-inset-bottom));
+    }
+  }
+  
+  /* Scrollbar personalizada para mobile */
+  .scrollbar-thin {
+    scrollbar-width: thin;
+    scrollbar-color: rgb(209 213 219) transparent;
+  }
+  
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 6px;
+  }
+  
+  .scrollbar-thin::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background-color: rgb(209 213 219);
+    border-radius: 3px;
+  }
+  
+  .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+    background-color: rgb(156 163 175);
+  }
+  
+  /* Hide scrollbar for carousel */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Smooth horizontal scroll for mobile carousel */
+  .mobile-carousel {
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Mobile carousel container */
+  .mobile-carousel-container {
+    scroll-snap-type: x mandatory;
+    scroll-padding: 0 1rem;
+  }
+
+  /* Mobile carousel items */
+  .mobile-carousel-item {
+    scroll-snap-align: start;
+    scroll-snap-stop: normal;
+  }
+}
+
+@layer components {
+  .card {
+    @apply bg-white rounded-xl shadow-sm border border-gray-100 p-6;
+  }
+  
+  .btn-primary {
+    @apply bg-primary-500 hover:bg-primary-600 text-white font-medium px-4 py-2 rounded-lg transition-colors;
+  }
+  
+  .text-success {
+    @apply text-green-600;
+  }
+  
+  .text-danger {
+    @apply text-red-600;
+  }
+}
+
+/* Efeito de glow piscando para botão pendente */
+@keyframes glow-pulse {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4), 0 0 0 0 rgba(239, 68, 68, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 0 6px rgba(239, 68, 68, 0.2), 0 0 0 12px rgba(239, 68, 68, 0.1);
+  }
+}
+
+.intense-pulse {
+  animation: glow-pulse 2s ease-in-out infinite;
+  box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4) !important;
+  transition: all 0.3s ease;
+}
+
+.intense-pulse:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4), 0 8px 25px rgba(239, 68, 68, 0.3) !important;
+  filter: brightness(1.1);
+}
+
+/* Efeito de glow piscando amarelo para botão parcial */
+@keyframes glow-pulse-yellow {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(234, 179, 8, 0.4), 0 0 0 0 rgba(234, 179, 8, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 0 6px rgba(234, 179, 8, 0.2), 0 0 0 12px rgba(234, 179, 8, 0.1);
+  }
+}
+
+.intense-pulse-yellow {
+  animation: glow-pulse-yellow 2s ease-in-out infinite;
+  box-shadow: 0 0 0 0 rgba(234, 179, 8, 0.4) !important;
+  transition: all 0.3s ease;
+}
+
+.intense-pulse-yellow:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0 0 0 rgba(234, 179, 8, 0.4), 0 8px 25px rgba(234, 179, 8, 0.3) !important;
+  filter: brightness(1.1);
+}
+
+/* Efeito de glow piscando verde para botão pago */
+@keyframes glow-pulse-green {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.4), 0 0 0 0 rgba(34, 197, 94, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 0 6px rgba(34, 197, 94, 0.2), 0 0 0 12px rgba(34, 197, 94, 0.1);
+  }
+}
+
+.intense-pulse-green {
+  animation: glow-pulse-green 2s ease-in-out infinite;
+  box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.4) !important;
+  transition: all 0.3s ease;
+}
+
+.intense-pulse-green:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.4), 0 8px 25px rgba(34, 197, 94, 0.3) !important;
+  filter: brightness(1.1);
+}
+
+/* Mobile table - No horizontal scroll */
+@media (max-width: 1023px) {
+  .transactions-container {
+    overflow-x: hidden;
+    width: 100%;
+  }
+  
+  .transactions-table {
+    table-layout: fixed;
+    width: 100%;
+    min-width: unset;
+  }
+  
+  .transactions-table th:nth-child(3), /* Categoria */
+  .transactions-table td:nth-child(3) {
+    width: 50%;
+  }
+  
+  .transactions-table th:nth-child(6), /* Status */
+  .transactions-table td:nth-child(6) {
+    width: 25%;
+  }
+  
+  .transactions-table th:nth-child(7), /* Valor */
+  .transactions-table td:nth-child(7) {
+    width: 25%;
+  }
+}
+
+
+

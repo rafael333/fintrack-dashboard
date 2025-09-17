@@ -1,0 +1,53 @@
+{
+  "name": "fintrack-dashboard",
+  "version": "1.0.0",
+  "description": "Dashboard Financeiro FinTrack - Aplicativo Web e Mobile",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "build:prod": "tsc && vite build --mode production",
+    "build:netlify": "npm run clean && npm run build:prod",
+    "preview": "vite preview",
+    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "clean": "rimraf dist node_modules/.vite"
+  },
+  "dependencies": {
+    "@emoji-mart/data": "^1.2.1",
+    "@emoji-mart/react": "^1.1.1",
+    "d3": "^7.9.0",
+    "firebase": "^12.2.1",
+    "lucide-react": "^0.294.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "recharts": "^2.8.0"
+  },
+  "devDependencies": {
+    "@types/d3": "^7.4.3",
+    "@types/react": "^18.2.37",
+    "@types/react-dom": "^18.2.15",
+    "@typescript-eslint/eslint-plugin": "^6.10.0",
+    "@typescript-eslint/parser": "^6.10.0",
+    "@vitejs/plugin-react": "^4.1.0",
+    "autoprefixer": "^10.4.16",
+    "eslint": "^8.53.0",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "eslint-plugin-react-refresh": "^0.4.4",
+    "postcss": "^8.4.31",
+    "rimraf": "^5.0.5",
+    "tailwindcss": "^3.3.5",
+    "terser": "^5.24.0",
+    "typescript": "^5.2.2",
+    "vite": "^7.1.5"
+  },
+  "keywords": [
+    "finanças",
+    "dashboard",
+    "react",
+    "typescript",
+    "mobile"
+  ],
+  "author": "FinTrack Team",
+  "license": "MIT"
+}
