@@ -818,6 +818,16 @@ const Transactions = () => {
               >
                 Todas
               </button>
+              <button
+                onClick={() => setActiveTagFilter('pending')}
+                className={`flex-shrink-0 px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
+                  activeTagFilter === 'pending'
+                    ? 'bg-yellow-100 text-yellow-700 border border-yellow-200'
+                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                }`}
+              >
+                Pendentes
+              </button>
               <PaidAccountsButton
                 onClick={handlePaidTagClick}
                 notificationCount={paidNotificationCount}
@@ -836,16 +846,6 @@ const Transactions = () => {
                 }`}
               >
                 Perto de Vencer
-              </button>
-              <button
-                onClick={() => setActiveTagFilter('pending')}
-                className={`flex-shrink-0 px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
-                  activeTagFilter === 'pending'
-                    ? 'bg-yellow-100 text-yellow-700 border border-yellow-200'
-                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                }`}
-              >
-                Pendentes
               </button>
               <button
                 onClick={() => setActiveTagFilter('high-expenses')}
@@ -882,6 +882,16 @@ const Transactions = () => {
             >
               Todas
             </button>
+            <button
+              onClick={() => setActiveTagFilter('pending')}
+              className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-200 ${
+                activeTagFilter === 'pending'
+                  ? 'bg-yellow-100 text-yellow-700 border border-yellow-200'
+                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+              }`}
+            >
+              Pendentes
+            </button>
             <PaidAccountsButton
               onClick={handlePaidTagClick}
               notificationCount={paidNotificationCount}
@@ -900,16 +910,6 @@ const Transactions = () => {
               }`}
             >
               Perto de Vencer
-            </button>
-            <button
-              onClick={() => setActiveTagFilter('pending')}
-              className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-200 ${
-                activeTagFilter === 'pending'
-                  ? 'bg-yellow-100 text-yellow-700 border border-yellow-200'
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-              }`}
-            >
-              Pendentes
             </button>
             <button
               onClick={() => setActiveTagFilter('high-expenses')}
