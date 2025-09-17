@@ -1308,22 +1308,37 @@ const Transactions = () => {
           <div className="text-xs lg:text-sm text-gray-600 text-center sm:text-left">
             Mostrando {startIndex + 1}-{Math.min(endIndex, safeGroupedTransactions.length)} de {safeGroupedTransactions.length} transações
           </div>
-          <div className="flex items-center justify-center space-x-1 lg:space-x-2">
+          
+          {/* Mobile: Ver mais quando há 10+ transações */}
+          {safeGroupedTransactions.length >= 10 && (
+            <div className="lg:hidden flex justify-center">
+              <button
+                onClick={() => setCurrentPage(currentPage + 1)}
+                disabled={currentPage >= totalPages}
+                className="px-6 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed text-white text-sm font-medium rounded-lg transition-colors"
+              >
+                Ver mais
+              </button>
+            </div>
+          )}
+          
+          {/* Desktop: Paginação completa */}
+          <div className="hidden lg:flex items-center justify-center space-x-2">
             {/* Botão anterior */}
             <button 
               onClick={goToPreviousPage}
               disabled={currentPage === 1}
-              className="p-1.5 lg:p-2 hover:bg-gray-100 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="p-2 hover:bg-gray-100 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              <svg className="w-3 h-3 lg:w-4 lg:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
               </svg>
             </button>
             
-            {/* Botões de página - mostrar apenas algumas no mobile */}
+            {/* Botões de página */}
             <div className="flex items-center space-x-1">
               {(() => {
-                const maxVisiblePages = window.innerWidth < 640 ? 3 : totalPages;
+                const maxVisiblePages = 5;
                 const startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
                 const endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
                 
@@ -1335,11 +1350,12 @@ const Transactions = () => {
                     <button
                       key={1}
                       onClick={() => goToPage(1)}
-                      className="w-6 h-6 lg:w-8 lg:h-8 rounded-lg text-[10px] lg:text-sm font-medium transition-colors text-gray-600 hover:bg-gray-100"
+                      className="w-8 h-8 rounded-lg text-sm font-medium transition-colors text-gray-600 hover:bg-gray-100"
                     >
                       1
                     </button>
                   );
+                  
                   if (startPage > 2) {
                     pages.push(<span key="ellipsis1" className="text-gray-400">...</span>);
                   }
@@ -1351,8 +1367,8 @@ const Transactions = () => {
                     <button
                       key={i}
                       onClick={() => goToPage(i)}
-                      className={`w-6 h-6 lg:w-8 lg:h-8 rounded-lg text-[10px] lg:text-sm font-medium transition-colors ${
-                        currentPage === i
+                      className={`w-8 h-8 rounded-lg text-sm font-medium transition-colors ${
+                        i === currentPage
                           ? 'bg-blue-600 text-white'
                           : 'text-gray-600 hover:bg-gray-100'
                       }`}
@@ -1371,7 +1387,7 @@ const Transactions = () => {
                     <button
                       key={totalPages}
                       onClick={() => goToPage(totalPages)}
-                      className="w-6 h-6 lg:w-8 lg:h-8 rounded-lg text-[10px] lg:text-sm font-medium transition-colors text-gray-600 hover:bg-gray-100"
+                      className="w-8 h-8 rounded-lg text-sm font-medium transition-colors text-gray-600 hover:bg-gray-100"
                     >
                       {totalPages}
                     </button>
@@ -1386,9 +1402,9 @@ const Transactions = () => {
             <button 
               onClick={goToNextPage}
               disabled={currentPage === totalPages}
-              className="p-1.5 lg:p-2 hover:bg-gray-100 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="p-2 hover:bg-gray-100 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              <svg className="w-3 h-3 lg:w-4 lg:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
               </svg>
             </button>
