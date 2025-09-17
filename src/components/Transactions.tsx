@@ -470,6 +470,21 @@ const Transactions = () => {
         })
         
         return [...paidGroupedArray, ...paidStandalone]
+      } else if (currentTagFilter === 'pending') {
+        // Se o filtro "pending" estiver ativo, retornar apenas transações não pagas
+        const pendingStandalone = standalone.filter((transaction: any) => !transaction.isPaid)
+        
+        // Para transações agrupadas (parceladas), filtrar apenas grupos que têm parcelas não pagas
+        const pendingGroupedArray = groupedArray.filter(group => {
+          // Se é um grupo de parcelas, verificar se tem parcelas não pagas
+          if (group.isGrouped) {
+            return group.paidInstallments < group.totalInstallments
+          }
+          // Se não é um grupo, verificar se a transação não está paga
+          return !group.isPaid
+        })
+        
+        return [...pendingGroupedArray, ...pendingStandalone]
       } else {
         // Para "Todas" e outros filtros, retornar todas as transações
         return [...groupedArray, ...standalone]
@@ -575,17 +590,6 @@ const Transactions = () => {
       } else {
         // Para transações à vista, verificar se está paga
         return transaction.isPaid === true
-      }
-    })
-  } else if (activeTagFilter === 'pending') {
-    // Pendentes - transações que NÃO foram completamente pagas
-    finalFilteredTransactions = finalFilteredTransactions.filter(transaction => {
-      // Para transações parceladas, verificar se NÃO está completamente paga
-      if (transaction.installments && transaction.installments > 1) {
-        return transaction.isPaid === false
-      } else {
-        // Para transações à vista, verificar se NÃO está paga
-        return transaction.isPaid === false
       }
     })
   }
