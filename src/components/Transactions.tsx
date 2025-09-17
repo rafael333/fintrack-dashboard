@@ -577,6 +577,17 @@ const Transactions = () => {
         return transaction.isPaid === true
       }
     })
+  } else if (activeTagFilter === 'pending') {
+    // Pendentes - transações que NÃO foram completamente pagas
+    finalFilteredTransactions = finalFilteredTransactions.filter(transaction => {
+      // Para transações parceladas, verificar se NÃO está completamente paga
+      if (transaction.installments && transaction.installments > 1) {
+        return transaction.isPaid === false
+      } else {
+        // Para transações à vista, verificar se NÃO está paga
+        return transaction.isPaid === false
+      }
+    })
   }
 
   // Agrupar transações parceladas com tratamento de erro
@@ -823,6 +834,16 @@ const Transactions = () => {
                 Perto de Vencer
               </button>
               <button
+                onClick={() => setActiveTagFilter('pending')}
+                className={`flex-shrink-0 px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
+                  activeTagFilter === 'pending'
+                    ? 'bg-yellow-100 text-yellow-700 border border-yellow-200'
+                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                }`}
+              >
+                Pendentes
+              </button>
+              <button
                 onClick={() => setActiveTagFilter('high-expenses')}
                 className={`flex-shrink-0 px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
                   activeTagFilter === 'high-expenses'
@@ -875,6 +896,16 @@ const Transactions = () => {
               }`}
             >
               Perto de Vencer
+            </button>
+            <button
+              onClick={() => setActiveTagFilter('pending')}
+              className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-200 ${
+                activeTagFilter === 'pending'
+                  ? 'bg-yellow-100 text-yellow-700 border border-yellow-200'
+                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+              }`}
+            >
+              Pendentes
             </button>
             <button
               onClick={() => setActiveTagFilter('high-expenses')}
@@ -947,6 +978,8 @@ const Transactions = () => {
               ? 'Nenhuma despesa encontrada'
               : activeTagFilter === 'high-revenues'
               ? 'Nenhuma receita encontrada'
+              : activeTagFilter === 'pending'
+              ? 'Nenhuma transação pendente encontrada'
               : 'Nenhuma transação encontrada'
             }
           </p>
@@ -957,6 +990,8 @@ const Transactions = () => {
               ? 'Não há despesas para mostrar'
               : activeTagFilter === 'high-revenues'
               ? 'Não há receitas para mostrar'
+              : activeTagFilter === 'pending'
+              ? 'Todas as transações foram completamente pagas'
               : 'Clique em "Nova Transação" para adicionar uma'
             }
           </p>
