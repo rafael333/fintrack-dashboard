@@ -151,13 +151,13 @@ const Sidebar = ({ activeTab, onTabChange }: SidebarProps) => {
                   : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
               }`}
             >
-              <div className="w-5 h-5">
+              <div className="w-6 h-6">
                 {homeIconData ? (
                   <Lottie 
                     animationData={homeIconData}
                     loop={false}
                     autoplay={shouldAnimate}
-                    style={{ width: '20px', height: '20px' }}
+                    style={{ width: '24px', height: '24px' }}
                   />
                 ) : (
                   <span>📊</span>
@@ -174,12 +174,12 @@ const Sidebar = ({ activeTab, onTabChange }: SidebarProps) => {
                   : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
               }`}
             >
-              <div className="w-5 h-5 flex items-center justify-center">
+              <div className="w-6 h-6 flex items-center justify-center">
                 <Lottie
                   animationData={walletAnimation}
                   loop={shouldAnimateWallet}
                   autoplay={shouldAnimateWallet}
-                  style={{ width: 20, height: 20 }}
+                  style={{ width: 24, height: 24 }}
                 />
               </div>
               <span className="font-medium">Transações</span>
@@ -193,12 +193,12 @@ const Sidebar = ({ activeTab, onTabChange }: SidebarProps) => {
                   : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
               }`}
             >
-              <div className="w-5 h-5 flex items-center justify-center">
+              <div className="w-6 h-6 flex items-center justify-center">
                 <Lottie
                   animationData={customisedReportAnimation}
                   loop={shouldAnimateChart}
                   autoplay={shouldAnimateChart}
-                  style={{ width: 20, height: 20 }}
+                  style={{ width: 24, height: 24 }}
                 />
               </div>
               <span className="font-medium">Relatórios</span>
@@ -212,12 +212,12 @@ const Sidebar = ({ activeTab, onTabChange }: SidebarProps) => {
                   : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
               }`}
             >
-              <div className="w-5 h-5 flex items-center justify-center">
+              <div className="w-6 h-6 flex items-center justify-center">
                 <Lottie
                   animationData={gearsAnimation}
                   loop={shouldAnimateGears}
                   autoplay={shouldAnimateGears}
-                  style={{ width: 20, height: 20 }}
+                  style={{ width: 24, height: 24 }}
                 />
               </div>
               <span className="font-medium">Configurações</span>
@@ -250,13 +250,13 @@ const Sidebar = ({ activeTab, onTabChange }: SidebarProps) => {
                   : 'text-gray-600 hover:bg-gray-50'
               }`}
             >
-              <div className="w-6 h-6">
+              <div className="w-7 h-7">
                 {homeIconData ? (
                   <Lottie 
                     animationData={homeIconData}
                     loop={false}
                     autoplay={shouldAnimate}
-                    style={{ width: '24px', height: '24px' }}
+                    style={{ width: '28px', height: '28px' }}
                   />
                 ) : (
                   <span className="text-lg">📊</span>
@@ -273,12 +273,12 @@ const Sidebar = ({ activeTab, onTabChange }: SidebarProps) => {
                   : 'text-gray-600 hover:bg-gray-50'
               }`}
             >
-              <div className="w-6 h-6 flex items-center justify-center">
+              <div className="w-7 h-7 flex items-center justify-center">
                 <Lottie
                   animationData={walletAnimation}
                   loop={shouldAnimateWallet}
                   autoplay={shouldAnimateWallet}
-                  style={{ width: 24, height: 24 }}
+                  style={{ width: 28, height: 28 }}
                 />
               </div>
               <span className="text-xs font-medium">Transações</span>
@@ -292,12 +292,12 @@ const Sidebar = ({ activeTab, onTabChange }: SidebarProps) => {
                   : 'text-gray-600 hover:bg-gray-50'
               }`}
             >
-              <div className="w-6 h-6 flex items-center justify-center">
+              <div className="w-7 h-7 flex items-center justify-center">
                 <Lottie
                   animationData={customisedReportAnimation}
                   loop={shouldAnimateChart}
                   autoplay={shouldAnimateChart}
-                  style={{ width: 24, height: 24 }}
+                  style={{ width: 28, height: 28 }}
                 />
               </div>
               <span className="text-xs font-medium">Relatórios</span>
@@ -311,12 +311,12 @@ const Sidebar = ({ activeTab, onTabChange }: SidebarProps) => {
                   : 'text-gray-600 hover:bg-gray-50'
               }`}
             >
-              <div className="w-6 h-6 flex items-center justify-center">
+              <div className="w-7 h-7 flex items-center justify-center">
                 <Lottie
                   animationData={gearsAnimation}
                   loop={shouldAnimateGears}
                   autoplay={shouldAnimateGears}
-                  style={{ width: 24, height: 24 }}
+                  style={{ width: 28, height: 28 }}
                 />
               </div>
               <span className="text-xs font-medium">Configurações</span>
