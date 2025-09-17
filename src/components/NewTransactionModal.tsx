@@ -270,7 +270,6 @@ const NewTransactionModal = ({ isOpen, onClose, userId, onTransactionCreating }:
       
     } catch (error) {
       console.error('❌ [NewTransactionModal] Erro ao criar transação:', error)
-      console.error('❌ [NewTransactionModal] Stack trace:', error instanceof Error ? error.stack : 'N/A')
       
       // Notificar que terminou de criar transação (mesmo com erro)
       onTransactionCreating?.(false)

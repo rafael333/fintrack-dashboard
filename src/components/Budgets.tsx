@@ -137,56 +137,18 @@ export function AreaChartSemiFilled() {
       })
       .sort((a, b) => a.date.localeCompare(b.date)) // Ordenar por string de data (YYYY-MM-DD)
 
-    console.log('📊 [AreaChartSemiFilled] Resultado final:', result)
     return result
   }, [transactions]) // Usar apenas transactions como dependência
 
   // Processar dados para a TABELA "Movimentação Diária" (filtrando TODAS as transações pagas)
   const dailyMovementData = useMemo(() => {
-    console.log('🔄 [Movimentação Diária] ⚡ USEMEMO EXECUTADO com', transactions.length, 'transações');
-    console.log('🔄 [Movimentação Diária] Timestamp:', new Date().toLocaleTimeString());
-    
     if (!transactions || transactions.length === 0) {
-      console.log('📊 [Movimentação Diária] Nenhuma transação encontrada');
       return []
     }
 
     // Filtrar APENAS transações NÃO PAGAS para a tabela
     const unpaidTransactions = transactions.filter(transaction => {
-      const isPaid = transaction.isPaid === true;
-      console.log('🔍 [Movimentação Diária] Verificando transação:', {
-        id: transaction.id.substring(0, 8) + '...',
-        description: transaction.description,
-        type: transaction.type,
-        amount: transaction.amount,
-        isPaid: transaction.isPaid,
-        willExclude: isPaid
-      });
-      
-      if (isPaid) {
-        console.log('🚫 [Movimentação Diária] EXCLUINDO transação paga');
-        return false;
-      }
-      
-      console.log('✅ [Movimentação Diária] INCLUINDO transação não paga');
-      return true;
-    });
-
-    console.log('📊 [Movimentação Diária] Transações não pagas para cálculo:', unpaidTransactions.map(t => ({
-      id: t.id.substring(0, 8) + '...',
-      description: t.description,
-      type: t.type,
-      amount: t.amount,
-      isPaid: t.isPaid
-    })));
-    
-    // Contar transações pagas vs não pagas
-    const paidCount = transactions.filter(t => t.isPaid === true).length;
-    const unpaidCount = unpaidTransactions.length;
-    console.log('📊 [Movimentação Diária] Resumo:', {
-      total: transactions.length,
-      pagas: paidCount,
-      naoPagas: unpaidCount
+      return transaction.isPaid !== true;
     });
 
     // Agrupar APENAS transações NÃO PAGAS por data

@@ -30,19 +30,11 @@ const Budget: React.FC<BudgetProps> = ({
   const [typeFilter, setTypeFilter] = useState('todas')
   
   
-  // Debug: Log dos estados dos filtros
-    // console.log('🔧 [Budget] Estados dos filtros:', {
-    //   periodFilter,
-    //   startDate,
-    //   endDate,
-    //   typeFilter,
-    //   isFiltersModalOpen
-    // })
+  // Debug: Log dos estados dos filtros (removido para produção)
 
   // Aplicar filtro de período quando as datas mudarem
   useEffect(() => {
     if (startDate && endDate) {
-      // console.log('📅 [Budget] Datas alteradas, aplicando filtro:', { startDate, endDate })
       // O filtro será aplicado automaticamente no useMemo abaixo
     }
   }, [startDate, endDate])
@@ -196,19 +188,8 @@ const Budget: React.FC<BudgetProps> = ({
   const groupedTransactions = React.useMemo(() => {
     const groups: { [key: string]: any[] } = {}
     
-    // console.log('🔍 [Budget] Processando TODAS as transações para agrupamento:', transactions.length)
-    // console.log('🔍 [Budget] Transações filtradas:', filteredTransactions.length)
-    
     // Primeiro, agrupar TODAS as transações parceladas (não apenas as filtradas)
     const allInstallmentGroups: { [key: string]: any[] } = {}
-    
-    // console.log('🔍 [Budget] Verificando transações para agrupamento:', transactions.map(t => ({
-    //   id: t.id.substring(0, 8) + '...',
-    //   description: t.description,
-    //   installments: t.installments,
-    //   installmentGroupId: t.installmentGroupId,
-    //   date: t.date.toISOString().split('T')[0]
-    // })))
     
     transactions.forEach(transaction => {
       if (transaction.installments && transaction.installments > 1) {
@@ -219,18 +200,8 @@ const Budget: React.FC<BudgetProps> = ({
           allInstallmentGroups[groupKey] = []
         }
         allInstallmentGroups[groupKey].push(transaction)
-        
-        // console.log('📦 [Budget] Transação parcelada encontrada:', {
-        //   groupKey,
-        //   description: transaction.description,
-        //   installments: transaction.installments,
-        //   installmentGroupId: transaction.installmentGroupId,
-        //   date: transaction.date.toISOString().split('T')[0]
-        // })
       }
     })
-    
-    // console.log('📊 [Budget] Grupos de parcelas encontrados:', Object.keys(allInstallmentGroups).length)
     
     // Agora verificar quais grupos devem aparecer baseado no filtro de data
     Object.entries(allInstallmentGroups).forEach(([groupKey, groupTransactions]) => {
