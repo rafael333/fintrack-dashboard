@@ -961,12 +961,70 @@ const Budgets = () => {
   const [endDate, setEndDate] = useState('')
   const [transactionTypeFilter, setTransactionTypeFilter] = useState('todas')
   
+  // Estados para editar meta (mobile)
+  const [metaMensal, setMetaMensal] = useState(25000)
+  const [isEditingMeta, setIsEditingMeta] = useState(false)
+  const [novaMeta, setNovaMeta] = useState('')
+  
   // Hook do contexto para transações
   const { transactions, loading: transactionsLoading, error: transactionsError } = useTransactionsContext()
   
   // Hook para categorias
   const { user } = useAuth()
   const { categories } = useCategories(user?.uid || 'test-user-123')
+
+  // Calcular totais do mês atual
+  const currentMonth = new Date().getMonth()
+  const currentYear = new Date().getFullYear()
+  
+  const monthlyTotals = useMemo(() => {
+    const currentMonthTransactions = transactions.filter(transaction => {
+      // Verificar se a transação tem uma data válida
+      if (!transaction || !transaction.date) {
+        return false;
+      }
+      
+      const transactionDate = new Date(transaction.date)
+      const isCurrentMonth = transactionDate.getMonth() === currentMonth && 
+                            transactionDate.getFullYear() === currentYear
+      
+      return isCurrentMonth
+    })
+
+    return currentMonthTransactions.reduce((totals, transaction) => {
+      if (transaction.type === 'receita') {
+        totals.receitas += transaction.amount
+      } else if (transaction.type === 'despesa') {
+        totals.despesas += transaction.amount
+      }
+      return totals
+    }, { receitas: 0, despesas: 0, saldo: 0 })
+  }, [transactions, currentMonth, currentYear])
+
+  // Calcular saldo
+  const totalReceitas = monthlyTotals.receitas
+  const totalDespesas = monthlyTotals.despesas
+  const saldoAtual = totalReceitas - totalDespesas
+
+  // Funções para editar meta
+  const handleEditMeta = () => {
+    setIsEditingMeta(true)
+    setNovaMeta(metaMensal.toString())
+  }
+  
+  const handleSaveMeta = () => {
+    const valor = parseFloat(novaMeta.replace(/[^\d,]/g, '').replace(',', '.'))
+    if (!isNaN(valor) && valor > 0) {
+      setMetaMensal(valor)
+      setIsEditingMeta(false)
+      setNovaMeta('')
+    }
+  }
+  
+  const handleCancelEdit = () => {
+    setIsEditingMeta(false)
+    setNovaMeta('')
+  }
 
   // Função para calcular datas baseadas no período
   const getDateRange = (period: string) => {
@@ -1772,10 +1830,69 @@ const Budgets = () => {
                 <span className="text-blue-600 text-lg">🎯</span>
               </div>
             </div>
-            <div className="ml-4">
-              <p className="text-sm font-medium text-gray-500">Meta Mensal</p>
-              <p className="text-lg font-semibold text-gray-900">R$ 1.055,65 / R$ 25.000</p>
-              <p className="text-xs text-gray-500">4% concluído</p>
+            <div className="ml-4 flex-1">
+              <div className="flex items-center justify-between">
+                <p className="text-sm font-medium text-gray-500">Meta Mensal</p>
+                {!isEditingMeta && (
+                  <button
+                    onClick={handleEditMeta}
+                    className="text-blue-600 hover:text-blue-800 text-xs font-medium"
+                  >
+                    Editar
+                  </button>
+                )}
+              </div>
+
+              {isEditingMeta ? (
+                <div className="space-y-2">
+                  <div className="flex items-center space-x-2">
+                    <span className="text-sm text-gray-500">R$</span>
+                    <input
+                      type="text"
+                      value={novaMeta}
+                      onChange={(e) => setNovaMeta(e.target.value)}
+                      className="text-lg font-semibold text-gray-900 border border-gray-300 rounded px-2 py-1 w-24"
+                      placeholder="25000"
+                      autoFocus
+                    />
+                  </div>
+                  <div className="flex space-x-2">
+                    <button
+                      onClick={handleSaveMeta}
+                      className="bg-blue-600 text-white text-xs px-3 py-1 rounded hover:bg-blue-700"
+                    >
+                      Salvar
+                    </button>
+                    <button
+                      onClick={handleCancelEdit}
+                      className="bg-gray-300 text-gray-700 text-xs px-3 py-1 rounded hover:bg-gray-400"
+                    >
+                      Cancelar
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <>
+                  <p className="text-lg font-semibold text-gray-900">
+                    R$ {totalReceitas.toLocaleString('pt-BR')} / R$ {metaMensal.toLocaleString('pt-BR')}
+                  </p>
+                  <div className="w-full bg-gray-200 rounded-full h-2 mt-2">
+                    <div 
+                      className={`h-2 rounded-full ${
+                        (totalReceitas / metaMensal) * 100 < 33 
+                          ? 'bg-yellow-500' 
+                          : (totalReceitas / metaMensal) * 100 < 66 
+                          ? 'bg-blue-600' 
+                          : 'bg-green-500'
+                      }`}
+                      style={{width: `${Math.min((totalReceitas / metaMensal) * 100, 100)}%`}}
+                    ></div>
+                  </div>
+                  <p className="text-xs text-gray-500 mt-1">
+                    {Math.round((totalReceitas / metaMensal) * 100)}% concluído
+                  </p>
+                </>
+              )}
             </div>
           </div>
         </div>
