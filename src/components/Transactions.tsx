@@ -988,7 +988,7 @@ const Transactions = () => {
                         <div className={`text-sm font-semibold ${
                           transaction.type === 'receita' ? 'text-green-600' : 'text-red-600'
                         }`}>
-                          {transaction.type === 'receita' ? '+' : '-'}R$ {transaction.totalAmount.toFixed(2)}
+                          {transaction.type === 'receita' ? '+' : '-'}R$ {Math.max(0, transaction.totalAmount - (transaction.installmentAmount * transaction.paidInstallments)).toFixed(2)}
                         </div>
                       </div>
                       <p className="text-xs text-gray-500">{transaction.description || ''}</p>
