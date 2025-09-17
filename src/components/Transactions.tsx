@@ -965,14 +965,13 @@ const Transactions = () => {
             if (transaction.isGrouped) {
               return (
                 <div key={transaction.id} className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
-                  <div className="flex items-start justify-between mb-3">
-                    <div className="flex items-center space-x-3">
-                      <div 
-                        className="flex h-10 w-10 items-center justify-center rounded-xl"
-                        style={{ backgroundColor: `${category.color}20` }}
-                      >
-                        <span className="text-lg">{category.icon}</span>
-                      </div>
+                  <div className="flex items-center space-x-3 mb-3">
+                    <div 
+                      className="flex h-10 w-10 items-center justify-center rounded-xl"
+                      style={{ backgroundColor: `${category.color}20` }}
+                    >
+                      <span className="text-lg">{category.icon}</span>
+                    </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between">
                         <h4 className="text-sm font-semibold text-gray-900 truncate">
@@ -986,7 +985,6 @@ const Transactions = () => {
                       </div>
                       <p className="text-xs text-gray-500">{transaction.description || ''}</p>
                     </div>
-                  </div>
                   </div>
                   
                   <div className="flex items-center justify-between mb-3">
