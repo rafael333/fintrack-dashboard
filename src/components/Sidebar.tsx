@@ -29,14 +29,26 @@ const Sidebar = ({ activeTab, onTabChange }: SidebarProps) => {
   }
 
   const handleDashboardClick = () => {
-    setShouldAnimate(true)
-    handleTabChange('dashboard')
+    if (activeTab === 'dashboard') {
+      // Se já está no dashboard, executar animação
+      setShouldAnimate(true)
+    } else {
+      // Se não está no dashboard, apenas navegar
+      handleTabChange('dashboard')
+    }
   }
 
   // Resetar animação quando sair do dashboard
   useEffect(() => {
     if (activeTab !== 'dashboard') {
       setShouldAnimate(false)
+    }
+  }, [activeTab])
+
+  // Executar animação quando estiver no dashboard
+  useEffect(() => {
+    if (activeTab === 'dashboard') {
+      setShouldAnimate(true)
     }
   }, [activeTab])
 
