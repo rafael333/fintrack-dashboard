@@ -9,6 +9,7 @@ import Lottie from 'lottie-react'
 import { useState, useEffect } from 'react'
 import walletAnimation from '../assets/Flying Wallet Money.json'
 import chartAnimation from '../assets/Chart Reports.json'
+import gearsAnimation from '../assets/Gears Lottie Animation.json'
 
 interface SidebarProps {
   activeTab: string
@@ -20,6 +21,7 @@ const Sidebar = ({ activeTab, onTabChange }: SidebarProps) => {
   const [shouldAnimate, setShouldAnimate] = useState(false)
   const [shouldAnimateWallet, setShouldAnimateWallet] = useState(false)
   const [shouldAnimateChart, setShouldAnimateChart] = useState(false)
+  const [shouldAnimateGears, setShouldAnimateGears] = useState(false)
 
   useEffect(() => {
     fetch('/home-icon.json')
@@ -62,6 +64,16 @@ const Sidebar = ({ activeTab, onTabChange }: SidebarProps) => {
     }
   }
 
+  const handleSettingsClick = () => {
+    if (activeTab === 'settings') {
+      // Se já está nas configurações, executar animação
+      setShouldAnimateGears(true)
+    } else {
+      // Se não está nas configurações, apenas navegar
+      handleTabChange('settings')
+    }
+  }
+
   // Resetar animação quando sair do dashboard
   useEffect(() => {
     if (activeTab !== 'dashboard') {
@@ -101,6 +113,20 @@ const Sidebar = ({ activeTab, onTabChange }: SidebarProps) => {
   useEffect(() => {
     if (activeTab === 'budgets') {
       setShouldAnimateChart(true)
+    }
+  }, [activeTab])
+
+  // Resetar animação das configurações quando sair das configurações
+  useEffect(() => {
+    if (activeTab !== 'settings') {
+      setShouldAnimateGears(false)
+    }
+  }, [activeTab])
+
+  // Executar animação das configurações quando estiver nas configurações
+  useEffect(() => {
+    if (activeTab === 'settings') {
+      setShouldAnimateGears(true)
     }
   }, [activeTab])
 
@@ -179,14 +205,21 @@ const Sidebar = ({ activeTab, onTabChange }: SidebarProps) => {
             </button>
             
             <button 
-              onClick={() => handleTabChange('settings')}
+              onClick={handleSettingsClick}
               className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors ${
                 activeTab === 'settings' 
                   ? 'bg-green-50 text-green-700' 
                   : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
               }`}
             >
-              <span>⚙️</span>
+              <div className="w-5 h-5 flex items-center justify-center">
+                <Lottie
+                  animationData={gearsAnimation}
+                  loop={shouldAnimateGears}
+                  autoplay={shouldAnimateGears}
+                  style={{ width: 20, height: 20 }}
+                />
+              </div>
               <span className="font-medium">Configurações</span>
             </button>
             
@@ -271,14 +304,21 @@ const Sidebar = ({ activeTab, onTabChange }: SidebarProps) => {
             </button>
             
             <button 
-              onClick={() => handleTabChange('settings')}
+              onClick={handleSettingsClick}
               className={`flex flex-col items-center space-y-1 px-3 py-2 rounded-lg transition-colors ${
                 activeTab === 'settings' 
                   ? 'bg-green-50 text-green-700' 
                   : 'text-gray-600 hover:bg-gray-50'
               }`}
             >
-              <span className="text-lg">⚙️</span>
+              <div className="w-6 h-6 flex items-center justify-center">
+                <Lottie
+                  animationData={gearsAnimation}
+                  loop={shouldAnimateGears}
+                  autoplay={shouldAnimateGears}
+                  style={{ width: 24, height: 24 }}
+                />
+              </div>
               <span className="text-xs font-medium">Configurações</span>
             </button>
             
