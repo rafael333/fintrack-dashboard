@@ -1051,8 +1051,11 @@ const Transactions = () => {
                     </div>
                   </div>
                   
-                  {/* Botão de Deletar */}
-                  <div className="flex justify-end">
+                  {/* Botão de Deletar e Datas */}
+                  <div className="flex items-center justify-between">
+                    <div className="text-xs text-gray-500">
+                      {new Date(transaction.firstDate).toLocaleDateString('pt-BR')} - {new Date(transaction.lastDate).toLocaleDateString('pt-BR')}
+                    </div>
                     <button
                       onClick={() => handleDeleteTransaction(transaction)}
                       className="p-1 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
@@ -1061,16 +1064,6 @@ const Transactions = () => {
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                       </svg>
                     </button>
-                  </div>
-                  
-                  {/* Informações de Data */}
-                  <div className="mt-2 text-center">
-                    <div className="text-xs text-gray-500">
-                      Criada em: {new Date(transaction.firstDate).toLocaleDateString('pt-BR')}
-                    </div>
-                    <div className="text-xs text-gray-500">
-                      Última parcela: {new Date(transaction.lastDate).toLocaleDateString('pt-BR')}
-                    </div>
                   </div>
                 </div>
               )
