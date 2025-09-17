@@ -985,10 +985,15 @@ const Transactions = () => {
                         <h4 className="text-sm font-semibold text-gray-900 truncate">
                           {category.name}
                         </h4>
-                        <div className={`text-sm font-semibold ${
-                          transaction.type === 'receita' ? 'text-green-600' : 'text-red-600'
-                        }`}>
-                          {transaction.type === 'receita' ? '+' : '-'}R$ {Math.max(0, transaction.totalAmount - (transaction.installmentAmount * transaction.paidInstallments)).toFixed(2)}
+                        <div className="text-right">
+                          <div className={`text-sm font-semibold ${
+                            transaction.type === 'receita' ? 'text-green-600' : 'text-red-600'
+                          }`}>
+                            {transaction.type === 'receita' ? '+' : '-'}R$ {Math.max(0, transaction.totalAmount - (transaction.installmentAmount * transaction.paidInstallments)).toFixed(2)}
+                          </div>
+                          <div className="text-xs text-gray-500">
+                            Total: R$ {transaction.totalAmount.toFixed(2)}
+                          </div>
                         </div>
                       </div>
                       <p className="text-xs text-gray-500">{transaction.description || ''}</p>
