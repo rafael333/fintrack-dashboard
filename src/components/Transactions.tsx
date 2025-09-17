@@ -1034,7 +1034,7 @@ const Transactions = () => {
                   </div>
                   
                   {/* Barra de Progresso das Parcelas */}
-                  <div>
+                  <div className="mb-3">
                     <div className="flex items-center justify-between mb-1">
                       <span className="text-xs text-gray-500">Progresso</span>
                       <span className="text-xs text-gray-500">
@@ -1054,6 +1054,18 @@ const Transactions = () => {
                       ></div>
                     </div>
                   </div>
+                  
+                  {/* Botão de Deletar */}
+                  <div className="flex justify-end">
+                    <button
+                      onClick={() => handleDeleteTransaction(transaction)}
+                      className="p-1 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                      </svg>
+                    </button>
+                  </div>
                 </div>
               )
             }
@@ -1061,29 +1073,19 @@ const Transactions = () => {
             // Se é uma transação única (não parcelada)
             return (
               <div key={transaction.id} className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
-                <div className="flex items-start justify-between mb-3">
-                  <div className="flex items-center space-x-3">
-                    <div 
-                      className="flex h-10 w-10 items-center justify-center rounded-xl"
-                      style={{ backgroundColor: `${category.color}20` }}
-                    >
-                      <span className="text-lg">{category.icon}</span>
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <h4 className="text-sm font-semibold text-gray-900 truncate">
-                        {category.name}
-                      </h4>
-                      <p className="text-xs text-gray-500">{transaction.description || ''}</p>
-                    </div>
-                  </div>
-                  <button
-                    onClick={() => handleDeleteTransaction(transaction)}
-                    className="p-1 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                <div className="flex items-center space-x-3 mb-3">
+                  <div 
+                    className="flex h-10 w-10 items-center justify-center rounded-xl"
+                    style={{ backgroundColor: `${category.color}20` }}
                   >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                    </svg>
-                  </button>
+                    <span className="text-lg">{category.icon}</span>
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h4 className="text-sm font-semibold text-gray-900 truncate">
+                      {category.name}
+                    </h4>
+                    <p className="text-xs text-gray-500">{transaction.description || ''}</p>
+                  </div>
                 </div>
                 
                 <div className="flex items-center justify-between mb-3">
@@ -1117,11 +1119,14 @@ const Transactions = () => {
                   <div className="text-xs text-gray-500">
                     {transaction.date.toLocaleDateString('pt-BR')}
                   </div>
-                  <div className={`text-sm font-semibold ${
-                    transaction.type === 'receita' ? 'text-green-600' : 'text-red-600'
-                  }`}>
-                    {transaction.type === 'receita' ? '+' : '-'}R$ {transaction.amount.toFixed(2)}
-                  </div>
+                  <button
+                    onClick={() => handleDeleteTransaction(transaction)}
+                    className="p-1 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                  </button>
                 </div>
               </div>
             )
