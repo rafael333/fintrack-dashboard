@@ -1043,7 +1043,7 @@ const Transactions = () => {
                     <div className="flex items-center justify-between mb-1">
                       <div className="text-xs text-gray-500">{transaction.paidInstallments}/{transaction.totalInstallments} parcelas</div>
                       <span className="text-xs text-gray-500">
-                        {Math.round((transaction.paidInstallments / transaction.totalInstallments) * 100)}%
+                        R$ {transaction.installmentAmount.toFixed(2)}
                       </span>
                     </div>
                     <div className="w-full bg-gray-200 rounded-full h-2">
