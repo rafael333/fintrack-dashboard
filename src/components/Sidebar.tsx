@@ -8,7 +8,7 @@ import {
 import Lottie from 'lottie-react'
 import { useState, useEffect } from 'react'
 import walletAnimation from '../assets/Flying Wallet Money.json'
-import chartAnimation from '../assets/Chart Reports.json'
+import customisedReportAnimation from '../assets/Customised report.json'
 import gearsAnimation from '../assets/Gears Lottie Animation.json'
 
 interface SidebarProps {
@@ -195,7 +195,7 @@ const Sidebar = ({ activeTab, onTabChange }: SidebarProps) => {
             >
               <div className="w-5 h-5 flex items-center justify-center">
                 <Lottie
-                  animationData={chartAnimation}
+                  animationData={customisedReportAnimation}
                   loop={shouldAnimateChart}
                   autoplay={shouldAnimateChart}
                   style={{ width: 20, height: 20 }}
@@ -294,7 +294,7 @@ const Sidebar = ({ activeTab, onTabChange }: SidebarProps) => {
             >
               <div className="w-6 h-6 flex items-center justify-center">
                 <Lottie
-                  animationData={chartAnimation}
+                  animationData={customisedReportAnimation}
                   loop={shouldAnimateChart}
                   autoplay={shouldAnimateChart}
                   style={{ width: 24, height: 24 }}
