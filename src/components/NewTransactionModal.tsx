@@ -160,9 +160,6 @@ const NewTransactionModal = ({ isOpen, onClose, userId, onTransactionCreating }:
     }
 
     try {
-      console.log('🚀 [NewTransactionModal] Iniciando criação de transação...')
-      console.log('📊 [NewTransactionModal] Dados do formulário:', formData)
-      
       // Notificar que está criando transação
       onTransactionCreating?.(true)
       
@@ -178,21 +175,12 @@ const NewTransactionModal = ({ isOpen, onClose, userId, onTransactionCreating }:
       
       // Validar se a data é válida
       if (isNaN(startDate.getTime())) {
-        console.error('❌ [NewTransactionModal] Data inválida:', dueDateValue)
         alert('Por favor, selecione uma data válida.')
         return
       }
       
-      console.log('📅 [NewTransactionModal] Data processada:', {
-        input: dueDateValue,
-        parsed: startDate,
-        localString: startDate.toLocaleDateString('pt-BR'),
-        isoString: startDate.toISOString()
-      })
-      
       if (isInstallment && formData.installments > 1) {
         // Criar múltiplas transações para parcelas
-        console.log(`📦 [NewTransactionModal] Criando ${formData.installments} transações parceladas...`)
         
         const transactionPromises = []
         const installmentGroupId = `installment_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`

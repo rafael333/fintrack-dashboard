@@ -49,29 +49,7 @@ const InstallmentAccounts: React.FC = () => {
     }).sort((a, b) => new Date(a.firstDate).getTime() - new Date(b.firstDate).getTime())
   }, [transactions])
 
-  // Debug: Log das transações parceladas
-  React.useEffect(() => {
-    console.log('📦 [InstallmentAccounts] Transações parceladas encontradas:', installmentGroups.length)
-    installmentGroups.forEach((group, index) => {
-      console.log(`📦 [InstallmentAccounts] Grupo ${index + 1}:`, {
-        description: group.description,
-        totalInstallments: group.totalInstallments,
-        paidInstallments: group.paidInstallments,
-        totalAmount: group.totalAmount,
-        installmentAmount: group.installmentAmount,
-        firstDate: group.firstDate.toLocaleDateString('pt-BR'),
-        lastDate: group.lastDate.toLocaleDateString('pt-BR'),
-        type: group.type,
-        category: group.category,
-        transactions: group.transactions.map(t => ({
-          id: t.id,
-          installmentNumber: t.installmentNumber,
-          isPaid: t.isPaid,
-          amount: t.amount
-        }))
-      })
-    })
-  }, [installmentGroups])
+  // Debug: Log das transações parceladas (removido para produção)
 
   if (loading) {
     return (

@@ -23,7 +23,7 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export const useAuth = () => {
+export const useAuth = (): AuthContextType => {
   const context = useContext(AuthContext);
   if (context === undefined) {
     throw new Error('useAuth deve ser usado dentro de um AuthProvider');
@@ -36,9 +36,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    console.log('🔐 AuthContext: Iniciando listener de autenticação...')
     const unsubscribe = onAuthStateChanged(auth, (user) => {
-      console.log('🔐 AuthContext: Estado de autenticação mudou:', { user: !!user, loading: false })
       setUser(user);
       setLoading(false);
     });
