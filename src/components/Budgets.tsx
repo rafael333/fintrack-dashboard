@@ -1766,7 +1766,7 @@ const Budgets = () => {
       <div className="lg:hidden space-y-3">
         <div className="overflow-x-auto scrollbar-hide mobile-carousel mobile-carousel-container">
           <div className="flex space-x-3 pb-2" style={{width: 'max-content'}}>
-            <div className="bg-white p-4 rounded-xl border-0 border-gray-200 flex-shrink-0 mobile-carousel-item" style={{minWidth: '180px'}}>
+            <div className="bg-white p-4 rounded-xl border-0 border-gray-200 flex-shrink-0 mobile-carousel-item" style={{minWidth: '280px'}}>
               <div className="flex items-center">
                 <div className="flex-shrink-0">
                   <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
@@ -1781,7 +1781,7 @@ const Budgets = () => {
               </div>
             </div>
             
-            <div className="bg-white p-4 rounded-xl border-0 border-gray-200 flex-shrink-0 mobile-carousel-item" style={{minWidth: '180px'}}>
+            <div className="bg-white p-4 rounded-xl border-0 border-gray-200 flex-shrink-0 mobile-carousel-item" style={{minWidth: '280px'}}>
               <div className="flex items-center">
                 <div className="flex-shrink-0">
                   <div className="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center">
