@@ -25,7 +25,7 @@ class ErrorBoundary extends Component<Props, State> {
     console.error('🚨 ErrorBoundary capturou um erro:', error, errorInfo);
   }
 
-  render() {
+  render(): ReactNode {
     if (this.state.hasError) {
       return (
         <div className="min-h-screen flex items-center justify-center bg-gray-50">
