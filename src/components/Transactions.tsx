@@ -999,16 +999,6 @@ const Transactions = () => {
                       }`}>
                         {transaction.type === 'receita' ? 'Receita' : 'Despesa'}
                       </span>
-                      <span className="inline-flex px-2 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-800">
-                        {transaction.installments}x
-                      </span>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <div className={`text-sm font-semibold ${
-                        transaction.type === 'receita' ? 'text-green-600' : 'text-red-600'
-                      }`}>
-                        {transaction.type === 'receita' ? '+' : '-'}R$ {transaction.totalAmount.toFixed(2)}
-                      </div>
                       <button
                         onClick={() => handleOpenPaymentModal(transaction)}
                         className={`inline-flex px-3 py-1 text-xs font-medium rounded-full transition-colors ${
@@ -1025,6 +1015,11 @@ const Transactions = () => {
                           ? 'Parcial'
                           : 'Pendente'}
                       </button>
+                    </div>
+                    <div className={`text-sm font-semibold ${
+                      transaction.type === 'receita' ? 'text-green-600' : 'text-red-600'
+                    }`}>
+                      {transaction.type === 'receita' ? '+' : '-'}R$ {transaction.totalAmount.toFixed(2)}
                     </div>
                   </div>
                   
