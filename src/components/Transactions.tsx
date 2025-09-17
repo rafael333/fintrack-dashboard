@@ -423,6 +423,14 @@ const Transactions = () => {
         // Recalcular total de parcelas baseado apenas nas parcelas visíveis (dentro do filtro)
         group.totalInstallments = transactionsInPeriod.length
         
+        // Manter o totalAmount original (não alterar baseado nas parcelas visíveis)
+        // O totalAmount deve sempre mostrar o valor total da transação parcelada
+        // Recalcular o totalAmount baseado no valor original da transação
+        if (group.allTransactions && group.allTransactions.length > 0) {
+          const firstTransaction = group.allTransactions[0]
+          group.totalAmount = firstTransaction.totalInstallmentAmount || (firstTransaction.amount * firstTransaction.installments)
+        }
+        
         // Atualizar as datas do grupo baseado nas parcelas no período
         if (transactionsInPeriod.length > 0) {
           group.firstDate = transactionsInPeriod.reduce((earliest: any, current: any) => 
