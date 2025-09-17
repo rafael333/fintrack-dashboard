@@ -1028,15 +1028,6 @@ const Transactions = () => {
                     </div>
                   </div>
                   
-                  {/* Informações das Parcelas */}
-                  <div className="flex items-center justify-between mb-3">
-                    <div className="text-xs text-gray-500">
-                      {transaction.paidInstallments}/{transaction.totalInstallments} parcelas
-                    </div>
-                    <div className="text-xs text-gray-500">
-                      {new Date(transaction.firstDate).toLocaleDateString('pt-BR')}
-                    </div>
-                  </div>
                   
                   {/* Barra de Progresso das Parcelas */}
                   <div className="mb-3">
