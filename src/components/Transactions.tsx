@@ -1031,6 +1031,28 @@ const Transactions = () => {
                       {transaction.type === 'receita' ? '+' : '-'}R$ {transaction.totalAmount.toFixed(2)}
                     </div>
                   </div>
+                  
+                  {/* Barra de Progresso das Parcelas */}
+                  <div className="mt-3">
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="text-xs text-gray-500">Progresso</span>
+                      <span className="text-xs text-gray-500">
+                        {Math.round((transaction.paidInstallments / transaction.totalInstallments) * 100)}%
+                      </span>
+                    </div>
+                    <div className="w-full bg-gray-200 rounded-full h-2">
+                      <div 
+                        className={`h-2 rounded-full transition-all duration-300 ${
+                          transaction.paidInstallments === transaction.totalInstallments
+                            ? 'bg-green-500'
+                            : transaction.paidInstallments > 0
+                            ? 'bg-yellow-500'
+                            : 'bg-red-500'
+                        }`}
+                        style={{width: `${(transaction.paidInstallments / transaction.totalInstallments) * 100}%`}}
+                      ></div>
+                    </div>
+                  </div>
                 </div>
               )
             }
