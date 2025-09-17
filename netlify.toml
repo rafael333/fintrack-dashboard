@@ -1,6 +1,6 @@
 [build]
   # Comando de build
-  command = "npm run build:prod"
+  command = "npm run build:netlify-simple"
   
   # Pasta de saída
   publish = "dist"
