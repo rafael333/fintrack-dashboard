@@ -1041,7 +1041,7 @@ const Transactions = () => {
                   {/* Barra de Progresso das Parcelas */}
                   <div className="mb-3">
                     <div className="flex items-center justify-between mb-1">
-                      <span className="text-xs text-gray-500">Progresso</span>
+                      <div className="text-xs text-gray-500">{transaction.paidInstallments}/{transaction.totalInstallments} parcelas</div>
                       <span className="text-xs text-gray-500">
                         {Math.round((transaction.paidInstallments / transaction.totalInstallments) * 100)}%
                       </span>
