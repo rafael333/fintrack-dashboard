@@ -809,16 +809,6 @@ const Transactions = () => {
           <div className="lg:hidden">
             <div className="flex overflow-x-auto scrollbar-hide space-x-2 pb-2">
               <button
-                onClick={() => setActiveTagFilter('all')}
-                className={`flex-shrink-0 px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
-                  activeTagFilter === 'all'
-                    ? 'bg-blue-100 text-blue-700 border border-blue-200'
-                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                }`}
-              >
-                Todas
-              </button>
-              <button
                 onClick={() => setActiveTagFilter('pending')}
                 className={`flex-shrink-0 px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
                   activeTagFilter === 'pending'
@@ -867,21 +857,21 @@ const Transactions = () => {
               >
                 Maiores Receitas
               </button>
+              <button
+                onClick={() => setActiveTagFilter('all')}
+                className={`flex-shrink-0 px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
+                  activeTagFilter === 'all'
+                    ? 'bg-blue-100 text-blue-700 border border-blue-200'
+                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                }`}
+              >
+                Todas
+              </button>
             </div>
           </div>
 
           {/* Filtros Desktop - Layout Original */}
           <div className="hidden lg:flex flex-wrap items-center gap-2">
-            <button
-              onClick={() => setActiveTagFilter('all')}
-              className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-200 ${
-                activeTagFilter === 'all'
-                  ? 'bg-blue-100 text-blue-700 border border-blue-200'
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-              }`}
-            >
-              Todas
-            </button>
             <button
               onClick={() => setActiveTagFilter('pending')}
               className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-200 ${
@@ -930,6 +920,16 @@ const Transactions = () => {
               }`}
             >
               Maiores Receitas
+            </button>
+            <button
+              onClick={() => setActiveTagFilter('all')}
+              className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-200 ${
+                activeTagFilter === 'all'
+                  ? 'bg-blue-100 text-blue-700 border border-blue-200'
+                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+              }`}
+            >
+              Todas
             </button>
             
             {/* Botão Filtros */}
