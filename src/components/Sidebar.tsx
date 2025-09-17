@@ -15,6 +15,7 @@ interface SidebarProps {
 
 const Sidebar = ({ activeTab, onTabChange }: SidebarProps) => {
   const [homeIconData, setHomeIconData] = useState(null)
+  const [shouldAnimate, setShouldAnimate] = useState(false)
 
   useEffect(() => {
     fetch('/home-icon.json')
@@ -26,6 +27,18 @@ const Sidebar = ({ activeTab, onTabChange }: SidebarProps) => {
   const handleTabChange = (tab: string) => {
     onTabChange(tab)
   }
+
+  const handleDashboardClick = () => {
+    setShouldAnimate(true)
+    handleTabChange('dashboard')
+  }
+
+  // Resetar animação quando sair do dashboard
+  useEffect(() => {
+    if (activeTab !== 'dashboard') {
+      setShouldAnimate(false)
+    }
+  }, [activeTab])
 
   return (
     <>
@@ -41,7 +54,7 @@ const Sidebar = ({ activeTab, onTabChange }: SidebarProps) => {
 
           <nav className="space-y-2">
             <button 
-              onClick={() => handleTabChange('dashboard')}
+              onClick={handleDashboardClick}
               className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors ${
                 activeTab === 'dashboard' 
                   ? 'bg-green-50 text-green-700' 
@@ -52,8 +65,8 @@ const Sidebar = ({ activeTab, onTabChange }: SidebarProps) => {
                 {homeIconData ? (
                   <Lottie 
                     animationData={homeIconData}
-                    loop={true}
-                    autoplay={true}
+                    loop={false}
+                    autoplay={shouldAnimate}
                     style={{ width: '20px', height: '20px' }}
                   />
                 ) : (
@@ -122,7 +135,7 @@ const Sidebar = ({ activeTab, onTabChange }: SidebarProps) => {
         <div className="px-2 py-2">
           <nav className="flex justify-around items-center">
             <button 
-              onClick={() => handleTabChange('dashboard')}
+              onClick={handleDashboardClick}
               className={`flex flex-col items-center space-y-1 px-3 py-2 rounded-lg transition-colors ${
                 activeTab === 'dashboard' 
                   ? 'bg-green-50 text-green-700' 
@@ -133,8 +146,8 @@ const Sidebar = ({ activeTab, onTabChange }: SidebarProps) => {
                 {homeIconData ? (
                   <Lottie 
                     animationData={homeIconData}
-                    loop={true}
-                    autoplay={true}
+                    loop={false}
+                    autoplay={shouldAnimate}
                     style={{ width: '24px', height: '24px' }}
                   />
                 ) : (
