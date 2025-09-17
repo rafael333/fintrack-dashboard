@@ -1095,17 +1095,22 @@ const Transactions = () => {
                     }`}>
                       {transaction.type === 'receita' ? 'Receita' : 'Despesa'}
                     </span>
+                    <button
+                      onClick={() => handleOpenPaymentModal(transaction)}
+                      className={`inline-flex px-3 py-1 text-xs font-medium rounded-full transition-colors ${
+                        transaction.isPaid
+                          ? 'bg-green-500 text-white'
+                          : 'bg-red-500 text-white'
+                      }`}
+                    >
+                      {transaction.isPaid ? 'Pago' : 'Pendente'}
+                    </button>
                   </div>
-                  <button
-                    onClick={() => handleOpenPaymentModal(transaction)}
-                    className={`inline-flex px-3 py-1 text-xs font-medium rounded-full transition-colors ${
-                      transaction.isPaid
-                        ? 'bg-green-500 text-white'
-                        : 'bg-red-500 text-white'
-                    }`}
-                  >
-                    {transaction.isPaid ? 'Pago' : 'Pendente'}
-                  </button>
+                  <div className={`text-sm font-semibold ${
+                    transaction.type === 'receita' ? 'text-green-600' : 'text-red-600'
+                  }`}>
+                    {transaction.type === 'receita' ? '+' : '-'}R$ {transaction.amount.toFixed(2)}
+                  </div>
                 </div>
                 
                 <div className="flex items-center justify-between">
