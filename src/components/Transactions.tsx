@@ -1399,7 +1399,7 @@ const Transactions = () => {
       {/* Floating Action Button - Mobile */}
       <button 
         onClick={handleModalOpen}
-        className="lg:hidden fixed bottom-20 right-6 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white w-16 h-16 rounded-full shadow-xl flex items-center justify-center transition-all duration-300 hover:scale-110 active:scale-95 z-50 group"
+        className="lg:hidden fixed bottom-28 right-6 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white w-16 h-16 rounded-full shadow-xl flex items-center justify-center transition-all duration-300 hover:scale-110 active:scale-95 z-50 group"
         style={{
           boxShadow: '0 8px 25px rgba(59, 130, 246, 0.4), 0 4px 12px rgba(0, 0, 0, 0.15)'
         }}
