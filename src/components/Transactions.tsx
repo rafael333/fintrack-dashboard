@@ -975,9 +975,9 @@ const Transactions = () => {
                       </div>
                       <div className="flex-1 min-w-0">
                         <h4 className="text-sm font-semibold text-gray-900 truncate">
-                          {transaction.description}
+                          {category.name}
                         </h4>
-                        <p className="text-xs text-gray-500">{category.name}</p>
+                        <p className="text-xs text-gray-500">{transaction.description || ''}</p>
                       </div>
                     </div>
                     <button
@@ -1071,9 +1071,9 @@ const Transactions = () => {
                     </div>
                     <div className="flex-1 min-w-0">
                       <h4 className="text-sm font-semibold text-gray-900 truncate">
-                        {transaction.description}
+                        {category.name}
                       </h4>
-                      <p className="text-xs text-gray-500">{category.name}</p>
+                      <p className="text-xs text-gray-500">{transaction.description || ''}</p>
                     </div>
                   </div>
                   <button
