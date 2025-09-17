@@ -1021,7 +1021,8 @@ const Transactions = () => {
                     </button>
                   </div>
                   
-                  <div className="flex items-center justify-between">
+                  {/* Valor Total */}
+                  <div className="flex items-center justify-between mb-3">
                     <div className="text-xs text-gray-500">
                       {transaction.paidInstallments}/{transaction.totalInstallments} parcelas
                     </div>
@@ -1033,7 +1034,7 @@ const Transactions = () => {
                   </div>
                   
                   {/* Barra de Progresso das Parcelas */}
-                  <div className="mt-3">
+                  <div>
                     <div className="flex items-center justify-between mb-1">
                       <span className="text-xs text-gray-500">Progresso</span>
                       <span className="text-xs text-gray-500">
