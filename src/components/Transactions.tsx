@@ -1003,33 +1003,38 @@ const Transactions = () => {
                         {transaction.installments}x
                       </span>
                     </div>
-                    <button
-                      onClick={() => handleOpenPaymentModal(transaction)}
-                      className={`inline-flex px-3 py-1 text-xs font-medium rounded-full transition-colors ${
-                        transaction.paidInstallments === transaction.totalInstallments
-                          ? 'bg-green-500 text-white'
+                    <div className="flex items-center space-x-2">
+                      <div className={`text-sm font-semibold ${
+                        transaction.type === 'receita' ? 'text-green-600' : 'text-red-600'
+                      }`}>
+                        {transaction.type === 'receita' ? '+' : '-'}R$ {transaction.totalAmount.toFixed(2)}
+                      </div>
+                      <button
+                        onClick={() => handleOpenPaymentModal(transaction)}
+                        className={`inline-flex px-3 py-1 text-xs font-medium rounded-full transition-colors ${
+                          transaction.paidInstallments === transaction.totalInstallments
+                            ? 'bg-green-500 text-white'
+                            : transaction.paidInstallments > 0
+                            ? 'bg-yellow-500 text-white'
+                            : 'bg-red-500 text-white'
+                        }`}
+                      >
+                        {transaction.paidInstallments === transaction.totalInstallments
+                          ? 'Pago'
                           : transaction.paidInstallments > 0
-                          ? 'bg-yellow-500 text-white'
-                          : 'bg-red-500 text-white'
-                      }`}
-                    >
-                      {transaction.paidInstallments === transaction.totalInstallments
-                        ? 'Pago'
-                        : transaction.paidInstallments > 0
-                        ? 'Parcial'
-                        : 'Pendente'}
-                    </button>
+                          ? 'Parcial'
+                          : 'Pendente'}
+                      </button>
+                    </div>
                   </div>
                   
-                  {/* Valor Total */}
+                  {/* Informações das Parcelas */}
                   <div className="flex items-center justify-between mb-3">
                     <div className="text-xs text-gray-500">
                       {transaction.paidInstallments}/{transaction.totalInstallments} parcelas
                     </div>
-                    <div className={`text-sm font-semibold ${
-                      transaction.type === 'receita' ? 'text-green-600' : 'text-red-600'
-                    }`}>
-                      {transaction.type === 'receita' ? '+' : '-'}R$ {transaction.totalAmount.toFixed(2)}
+                    <div className="text-xs text-gray-500">
+                      {new Date(transaction.firstDate).toLocaleDateString('pt-BR')}
                     </div>
                   </div>
                   
