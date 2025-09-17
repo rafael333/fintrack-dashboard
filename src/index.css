@@ -432,5 +432,26 @@
   }
 }
 
+/* Mobile Carousel Styles */
+.mobile-carousel {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* Internet Explorer 10+ */
+}
 
+.mobile-carousel::-webkit-scrollbar {
+  display: none; /* WebKit */
+}
+
+.mobile-carousel-container {
+  scroll-behavior: smooth;
+}
+
+.mobile-carousel-item {
+  transition: transform 0.2s ease-in-out;
+}
+
+.mobile-carousel-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
 

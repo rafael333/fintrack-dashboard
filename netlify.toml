@@ -10,7 +10,7 @@
 
 [build.environment]
   # Versão do Node.js (requerida pelo Firebase e Vite)
-  NODE_VERSION = "18"
+  NODE_VERSION = "20"
   
   # Variáveis de ambiente (serão sobrescritas pelas do painel)
   NODE_ENV = "production"

@@ -1762,6 +1762,83 @@ const Budgets = () => {
               </button>
       </div>
 
+      {/* Mobile Cards - Carrossel */}
+      <div className="lg:hidden space-y-3">
+        <div className="overflow-x-auto scrollbar-hide mobile-carousel mobile-carousel-container">
+          <div className="flex space-x-3 pb-2" style={{width: 'max-content'}}>
+            <div className="bg-white p-4 rounded-xl border-0 border-gray-200 flex-shrink-0 mobile-carousel-item" style={{minWidth: '280px'}}>
+              <div className="flex items-center">
+                <div className="flex-shrink-0">
+                  <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
+                    <span className="text-blue-600 text-lg">🎯</span>
+                  </div>
+                </div>
+                <div className="ml-4 flex-1">
+                  <div className="flex items-center justify-between">
+                    <p className="text-sm font-medium text-gray-500">Meta Mensal</p>
+                    <button className="text-blue-600 hover:text-blue-800 text-xs font-medium">Editar</button>
+                  </div>
+                  <p className="text-lg font-semibold text-gray-900">R$ 1.055,65 / R$ 25.000</p>
+                  <div className="w-full bg-gray-200 rounded-full h-2 mt-2">
+                    <div className="h-2 rounded-full bg-yellow-500" style={{width: '4.2226%'}}></div>
+                  </div>
+                  <p className="text-xs text-gray-500 mt-1">4% concluído</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div className="overflow-x-auto scrollbar-hide mobile-carousel mobile-carousel-container">
+          <div className="flex space-x-3 pb-2" style={{width: 'max-content'}}>
+            <div className="bg-white p-4 rounded-xl border-0 border-gray-200 flex-shrink-0 mobile-carousel-item" style={{minWidth: '180px'}}>
+              <div className="flex items-center">
+                <div className="flex-shrink-0">
+                  <div className="w-8 h-8 bg-orange-100 rounded-lg flex items-center justify-center">
+                    <span className="text-orange-600 text-lg">📅</span>
+                  </div>
+                </div>
+                <div className="ml-4">
+                  <p className="text-sm font-medium text-gray-500">Dias Restantes</p>
+                  <p className="text-lg font-semibold text-gray-900">13 dias</p>
+                  <p className="text-xs text-gray-500">até o fim do mês</p>
+                </div>
+              </div>
+            </div>
+            
+            <div className="bg-white p-4 rounded-xl border-0 border-gray-200 flex-shrink-0 mobile-carousel-item" style={{minWidth: '180px'}}>
+              <div className="flex items-center">
+                <div className="flex-shrink-0">
+                  <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
+                    <span className="text-green-600 text-lg">📊</span>
+                  </div>
+                </div>
+                <div className="ml-4">
+                  <p className="text-sm font-medium text-gray-500">Média Diária</p>
+                  <p className="text-lg font-semibold text-gray-900">R$ 1.842</p>
+                  <p className="text-xs text-gray-500">necessária para meta</p>
+                </div>
+              </div>
+            </div>
+            
+            <div className="bg-white p-4 rounded-xl border-0 border-gray-200 flex-shrink-0 mobile-carousel-item" style={{minWidth: '180px'}}>
+              <div className="flex items-center">
+                <div className="flex-shrink-0">
+                  <div className="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center">
+                    <span className="text-purple-600 text-lg">📈</span>
+                  </div>
+                </div>
+                <div className="ml-4">
+                  <p className="text-sm font-medium text-gray-500">Tendência</p>
+                  <p className="text-lg font-semibold text-green-600">↗️ Crescendo</p>
+                  <p className="text-xs text-gray-500">+15% vs mês anterior</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Cards de Resumo */}
       <div className="hidden lg:grid grid-cols-3 gap-6">
         {(() => {
