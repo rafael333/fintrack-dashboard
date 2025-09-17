@@ -1780,26 +1780,7 @@ const Budgets = () => {
           </div>
         </div>
         
-        {/* Segunda linha: Tendência - mesmo tamanho dos outros cards */}
-        <div className="overflow-x-auto scrollbar-hide mobile-carousel mobile-carousel-container">
-          <div className="flex space-x-3 pb-2" style={{width: 'max-content'}}>
-            <div className="bg-white p-4 rounded-xl border-0 border-gray-200 flex-shrink-0 mobile-carousel-item" style={{minWidth: '180px'}}>
-              <div className="flex items-center">
-                <div className="flex-shrink-0">
-                  <div className="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center">
-                    <span className="text-purple-600 text-lg">📈</span>
-                  </div>
-                </div>
-                <div className="ml-4">
-                  <p className="text-sm font-medium text-gray-500">Tendência</p>
-                  <p className="text-lg font-semibold text-green-600">↗️ Crescendo</p>
-                  <p className="text-xs text-gray-500">+15% vs mês anterior</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        
+        {/* Segunda linha: Dias Restantes, Média Diária e Tendência */}
         <div className="overflow-x-auto scrollbar-hide mobile-carousel mobile-carousel-container">
           <div className="flex space-x-3 pb-2" style={{width: 'max-content'}}>
             <div className="bg-white p-4 rounded-xl border-0 border-gray-200 flex-shrink-0 mobile-carousel-item" style={{minWidth: '180px'}}>
@@ -1828,6 +1809,21 @@ const Budgets = () => {
                   <p className="text-sm font-medium text-gray-500">Média Diária</p>
                   <p className="text-lg font-semibold text-gray-900">R$ 1.842</p>
                   <p className="text-xs text-gray-500">necessária para meta</p>
+                </div>
+              </div>
+            </div>
+            
+            <div className="bg-white p-4 rounded-xl border-0 border-gray-200 flex-shrink-0 mobile-carousel-item" style={{minWidth: '180px'}}>
+              <div className="flex items-center">
+                <div className="flex-shrink-0">
+                  <div className="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center">
+                    <span className="text-purple-600 text-lg">📈</span>
+                  </div>
+                </div>
+                <div className="ml-4">
+                  <p className="text-sm font-medium text-gray-500">Tendência</p>
+                  <p className="text-lg font-semibold text-green-600">↗️ Crescendo</p>
+                  <p className="text-xs text-gray-500">+15% vs mês anterior</p>
                 </div>
               </div>
             </div>
