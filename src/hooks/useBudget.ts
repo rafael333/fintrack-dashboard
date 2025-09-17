@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useTransactionsContext } from '../contexts/TransactionsContext';
 import { useCategories } from './useCategories';
+import { Category } from '../firebase/types';
 
 interface BudgetItem {
   name: string;
@@ -11,7 +12,7 @@ interface BudgetItem {
 
 interface UseBudgetReturn {
   budgetData: BudgetItem[];
-  categories: any[];
+  categories: Category[];
   loading: boolean;
   error: string | null;
 }
@@ -61,14 +62,14 @@ export const useBudget = (selectedPeriod?: string, userId?: string, typeFilter?:
 
     // Criar dados do orçamento
     return allCategories
-      .filter(category => category.type === (typeFilter === 'all' ? 'despesa' : typeFilter))
-      .map(category => ({
+      .filter((category: Category) => category.type === (typeFilter === 'all' ? 'despesa' : typeFilter))
+      .map((category: Category) => ({
         name: category.name,
         actual: categoryTotals[category.id] || 0,
         budget: 1000, // Valor padrão do orçamento
         color: category.color || '#3B82F6'
       }))
-      .sort((a, b) => b.actual - a.actual);
+      .sort((a: BudgetItem, b: BudgetItem) => b.actual - a.actual);
   }, [transactions, allCategories, selectedPeriod, typeFilter]);
 
   return {

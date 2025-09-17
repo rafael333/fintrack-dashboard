@@ -68,8 +68,8 @@ export const TransactionsProvider: React.FC<TransactionsProviderProps> = ({ chil
   const updateTransaction = async (id: string, updates: Partial<Omit<Transaction, 'id' | 'createdAt' | 'updatedAt'>>): Promise<void> => {
     try {
       // Atualizar estado local imediatamente para melhor UX
-      setTransactions(prevTransactions => 
-        prevTransactions.map(transaction => 
+      setTransactions((prevTransactions: Transaction[]) => 
+        prevTransactions.map((transaction: Transaction) => 
           transaction.id === id 
             ? { ...transaction, ...updates, updatedAt: new Date() }
             : transaction
@@ -88,8 +88,8 @@ export const TransactionsProvider: React.FC<TransactionsProviderProps> = ({ chil
   const deleteTransaction = async (id: string): Promise<void> => {
     try {
       // Atualizar estado local ANTES de chamar o Firebase para melhor UX
-      setTransactions(prevTransactions => 
-        prevTransactions.filter(transaction => transaction.id !== id)
+      setTransactions((prevTransactions: Transaction[]) => 
+        prevTransactions.filter((transaction: Transaction) => transaction.id !== id)
       );
       
       await transactionService.delete(id);
