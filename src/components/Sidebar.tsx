@@ -8,6 +8,7 @@ import {
 import Lottie from 'lottie-react'
 import { useState, useEffect } from 'react'
 import walletAnimation from '../assets/Flying Wallet Money.json'
+import chartAnimation from '../assets/Chart Reports.json'
 
 interface SidebarProps {
   activeTab: string
@@ -18,6 +19,7 @@ const Sidebar = ({ activeTab, onTabChange }: SidebarProps) => {
   const [homeIconData, setHomeIconData] = useState(null)
   const [shouldAnimate, setShouldAnimate] = useState(false)
   const [shouldAnimateWallet, setShouldAnimateWallet] = useState(false)
+  const [shouldAnimateChart, setShouldAnimateChart] = useState(false)
 
   useEffect(() => {
     fetch('/home-icon.json')
@@ -50,6 +52,16 @@ const Sidebar = ({ activeTab, onTabChange }: SidebarProps) => {
     }
   }
 
+  const handleReportsClick = () => {
+    if (activeTab === 'budgets') {
+      // Se já está nos relatórios, executar animação
+      setShouldAnimateChart(true)
+    } else {
+      // Se não está nos relatórios, apenas navegar
+      handleTabChange('budgets')
+    }
+  }
+
   // Resetar animação quando sair do dashboard
   useEffect(() => {
     if (activeTab !== 'dashboard') {
@@ -75,6 +87,20 @@ const Sidebar = ({ activeTab, onTabChange }: SidebarProps) => {
   useEffect(() => {
     if (activeTab === 'transactions') {
       setShouldAnimateWallet(true)
+    }
+  }, [activeTab])
+
+  // Resetar animação dos relatórios quando sair dos relatórios
+  useEffect(() => {
+    if (activeTab !== 'budgets') {
+      setShouldAnimateChart(false)
+    }
+  }, [activeTab])
+
+  // Executar animação dos relatórios quando estiver nos relatórios
+  useEffect(() => {
+    if (activeTab === 'budgets') {
+      setShouldAnimateChart(true)
     }
   }, [activeTab])
 
@@ -134,17 +160,21 @@ const Sidebar = ({ activeTab, onTabChange }: SidebarProps) => {
             </button>
             
             <button 
-              onClick={() => {
-                console.log('🔄 [Sidebar] Clicando na aba Relatórios')
-                handleTabChange('budgets')
-              }}
+              onClick={handleReportsClick}
               className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors ${
                 activeTab === 'budgets' 
                   ? 'bg-green-50 text-green-700' 
                   : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
               }`}
             >
-              <span>📊</span>
+              <div className="w-5 h-5 flex items-center justify-center">
+                <Lottie
+                  animationData={chartAnimation}
+                  loop={shouldAnimateChart}
+                  autoplay={shouldAnimateChart}
+                  style={{ width: 20, height: 20 }}
+                />
+              </div>
               <span className="font-medium">Relatórios</span>
             </button>
             
@@ -222,17 +252,21 @@ const Sidebar = ({ activeTab, onTabChange }: SidebarProps) => {
             </button>
             
             <button 
-              onClick={() => {
-                console.log('🔄 [Sidebar] Clicando na aba Relatórios')
-                handleTabChange('budgets')
-              }}
+              onClick={handleReportsClick}
               className={`flex flex-col items-center space-y-1 px-3 py-2 rounded-lg transition-colors ${
                 activeTab === 'budgets' 
                   ? 'bg-green-50 text-green-700' 
                   : 'text-gray-600 hover:bg-gray-50'
               }`}
             >
-              <span className="text-lg">📊</span>
+              <div className="w-6 h-6 flex items-center justify-center">
+                <Lottie
+                  animationData={chartAnimation}
+                  loop={shouldAnimateChart}
+                  autoplay={shouldAnimateChart}
+                  style={{ width: 24, height: 24 }}
+                />
+              </div>
               <span className="text-xs font-medium">Relatórios</span>
             </button>
             
