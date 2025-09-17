@@ -107,7 +107,6 @@ const Sidebar = ({ activeTab, onTabChange }: SidebarProps) => {
                   : 'text-gray-600 hover:bg-gray-50'
               }`}
             >
-              <span className="text-lg">📊</span>
               <span className="text-xs font-medium">Dashboard</span>
             </button>
             
@@ -119,7 +118,6 @@ const Sidebar = ({ activeTab, onTabChange }: SidebarProps) => {
                   : 'text-gray-600 hover:bg-gray-50'
               }`}
             >
-              <span className="text-lg">🔄</span>
               <span className="text-xs font-medium">Transações</span>
             </button>
             
@@ -134,7 +132,6 @@ const Sidebar = ({ activeTab, onTabChange }: SidebarProps) => {
                   : 'text-gray-600 hover:bg-gray-50'
               }`}
             >
-              <span className="text-lg">📊</span>
               <span className="text-xs font-medium">Relatórios</span>
             </button>
             
@@ -146,7 +143,6 @@ const Sidebar = ({ activeTab, onTabChange }: SidebarProps) => {
                   : 'text-gray-600 hover:bg-gray-50'
               }`}
             >
-              <span className="text-lg">⚙️</span>
               <span className="text-xs font-medium">Configurações</span>
             </button>
             
