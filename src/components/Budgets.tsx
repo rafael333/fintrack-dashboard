@@ -1239,7 +1239,7 @@ const Budgets = () => {
         value: amount,
         color: getCategoryColor(category, index)
       }))
-      .sort((a, b) => b.value - a.value) // Ordenar por valor decrescente
+      .sort((a, b) => (b.value as number) - (a.value as number)) // Ordenar por valor decrescente
     
     return result
   }, [transactions, categories])
@@ -1643,7 +1643,7 @@ const Budgets = () => {
         value: amount,
         color: categories.find(cat => cat.name === category)?.color || '#ef4444'
       }))
-      .sort((a, b) => b.value - a.value)
+      .sort((a, b) => (b.value as number) - (a.value as number))
 
     return (
       <div className="space-y-6">
