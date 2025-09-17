@@ -1062,6 +1062,16 @@ const Transactions = () => {
                       </svg>
                     </button>
                   </div>
+                  
+                  {/* Informações de Data */}
+                  <div className="mt-2 text-center">
+                    <div className="text-xs text-gray-500">
+                      Criada em: {new Date(transaction.firstDate).toLocaleDateString('pt-BR')}
+                    </div>
+                    <div className="text-xs text-gray-500">
+                      Última parcela: {new Date(transaction.lastDate).toLocaleDateString('pt-BR')}
+                    </div>
+                  </div>
                 </div>
               )
             }
