@@ -5,14 +5,14 @@
   "type": "module",
   "main": "index.js",
   "scripts": {
-    "dev": "vite",
-    "build": "tsc && vite build",
-    "build:prod": "tsc && vite build --mode production",
+    "dev": "npx vite",
+    "build": "npx tsc && npx vite build",
+    "build:prod": "npx tsc && npx vite build --mode production",
     "build:netlify": "npm run clean && npm run build:prod",
     "build:netlify-simple": "npm install && npm run build:prod",
-    "preview": "vite preview",
-    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
-    "clean": "rimraf dist node_modules/.vite"
+    "preview": "npx vite preview",
+    "lint": "npx eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "clean": "npx rimraf dist node_modules/.vite"
   },
   "dependencies": {
     "@emoji-mart/data": "^1.2.1",
