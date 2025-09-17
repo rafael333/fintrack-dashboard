@@ -5,6 +5,8 @@ import {
   CreditCard, 
   Calculator
 } from 'lucide-react'
+import Lottie from 'lottie-react'
+import { useState, useEffect } from 'react'
 
 interface SidebarProps {
   activeTab: string
@@ -12,6 +14,15 @@ interface SidebarProps {
 }
 
 const Sidebar = ({ activeTab, onTabChange }: SidebarProps) => {
+  const [homeIconData, setHomeIconData] = useState(null)
+
+  useEffect(() => {
+    fetch('/home-icon.json')
+      .then(response => response.json())
+      .then(data => setHomeIconData(data))
+      .catch(error => console.error('Erro ao carregar ícone:', error))
+  }, [])
+
   const handleTabChange = (tab: string) => {
     onTabChange(tab)
   }
@@ -37,7 +48,18 @@ const Sidebar = ({ activeTab, onTabChange }: SidebarProps) => {
                   : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
               }`}
             >
-              <span>📊</span>
+              <div className="w-5 h-5">
+                {homeIconData ? (
+                  <Lottie 
+                    animationData={homeIconData}
+                    loop={true}
+                    autoplay={true}
+                    style={{ width: '20px', height: '20px' }}
+                  />
+                ) : (
+                  <span>📊</span>
+                )}
+              </div>
               <span className="font-medium">Dashboard</span>
             </button>
             
@@ -107,7 +129,18 @@ const Sidebar = ({ activeTab, onTabChange }: SidebarProps) => {
                   : 'text-gray-600 hover:bg-gray-50'
               }`}
             >
-              <span className="text-lg">📊</span>
+              <div className="w-6 h-6">
+                {homeIconData ? (
+                  <Lottie 
+                    animationData={homeIconData}
+                    loop={true}
+                    autoplay={true}
+                    style={{ width: '24px', height: '24px' }}
+                  />
+                ) : (
+                  <span className="text-lg">📊</span>
+                )}
+              </div>
               <span className="text-xs font-medium">Dashboard</span>
             </button>
             
