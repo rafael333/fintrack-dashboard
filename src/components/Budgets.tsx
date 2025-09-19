@@ -2278,6 +2278,85 @@ const Budgets = () => {
           </div>
         </div>
         
+        {/* Quarta linha: Cards de Resumo Financeiro */}
+        <div className="space-y-3">
+          {/* Card de Saldo Atual */}
+          <div className="bg-white p-4 rounded-xl shadow-lg border-2 border-gray-200">
+            <div className="text-center">
+              <h3 className="text-sm font-medium text-gray-600 mb-2">Saldo Atual</h3>
+              <div className="flex items-center justify-center space-x-2">
+                <p className={`text-3xl font-black ${saldoAtual >= 0 ? 'text-green-700' : 'text-red-700'}`}>
+                  {saldoAtual >= 0 ? '+' : '-'}R$&nbsp;{Math.abs(saldoAtual).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                </p>
+                <span className={`text-2xl ${saldoAtual >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                  {saldoAtual >= 0 ? '📈' : '⚠️'}
+                </span>
+              </div>
+              <div className="mt-2">
+                <p className="text-xs text-gray-500">
+                  {calculateMonthlyGrowth() >= 0 ? '+' : ''}{calculateMonthlyGrowth().toFixed(1)}% vs mês anterior
+                </p>
+                <div className="flex items-center justify-center space-x-1 mt-1">
+                  <span className={`text-xs ${calculateMonthlyGrowth() >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+                    {calculateMonthlyGrowth() >= 0 ? '↗️' : '↘️'}
+                  </span>
+                  <div className="w-16 h-1 bg-gray-200 rounded-full">
+                    <div 
+                      className={`h-1 rounded-full ${calculateMonthlyGrowth() >= 0 ? 'bg-green-500' : 'bg-red-500'}`}
+                      style={{width: `${Math.min(Math.abs(calculateMonthlyGrowth()), 100)}%`}}
+                    ></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          {/* Cards de Receitas e Despesas */}
+          <div className="flex space-x-3">
+            {/* Card de Receitas */}
+            <div className="bg-gradient-to-br from-green-50 to-white p-4 rounded-xl shadow border-2 border-green-100 flex-1">
+              <div className="text-center mb-3">
+                <h3 className="text-xs font-medium text-green-600 mb-1">Receitas</h3>
+                <div className="flex items-center justify-center space-x-1 mb-2">
+                  <span className="text-lg">💰</span>
+                </div>
+                <p className="text-2xl font-black text-green-700">R$&nbsp;{totalReceitas.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
+              </div>
+              <div className="mt-3">
+                <div className="mt-2">
+                  <p className="text-xs text-green-600 text-center">
+                    +1,2% esta semana
+                  </p>
+                  <div className="flex items-center justify-center space-x-1 mt-1">
+                    <span className="text-xs text-green-500">↗️</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            {/* Card de Despesas */}
+            <div className="bg-gradient-to-br from-red-100 to-red-50 p-4 rounded-xl shadow border-2 border-red-200 flex-1">
+              <div className="text-center mb-3">
+                <h3 className="text-xs font-medium text-red-600 mb-1">Despesas</h3>
+                <div className="flex items-center justify-center space-x-1 mb-2">
+                  <span className="text-lg">📉</span>
+                </div>
+                <p className="text-2xl font-black text-red-700">R$&nbsp;{totalDespesas.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
+              </div>
+              <div className="mt-3">
+                <div className="mt-2">
+                  <p className="text-xs text-red-600 text-center">
+                    +2,1% esta semana
+                  </p>
+                  <div className="flex items-center justify-center space-x-1 mt-1">
+                    <span className="text-xs text-red-500">↗️</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
       </div>
 
       <div className="hidden lg:grid grid-cols-3 gap-6">

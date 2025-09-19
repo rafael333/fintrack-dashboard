@@ -4,6 +4,7 @@ import { useTransactionsContext } from '../contexts/TransactionsContext'
 import { useAuth } from '../contexts/AuthContext'
 import { Transaction } from '../firebase/types'
 import { categoryService } from '../firebase/services/categories'
+import Lottie from 'lottie-react'
 
 interface SummaryData {
   currentBalance: number
@@ -19,37 +20,20 @@ interface SummaryData {
 const SummaryCards = () => {
   const { user } = useAuth()
   const { transactions, loading, error, createTransaction } = useTransactionsContext()
+  const [makingMoneyAnimation, setMakingMoneyAnimation] = useState(null)
 
-  // Se estiver carregando, mostrar loading
-  if (loading) {
-    return (
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {[1, 2, 3, 4].map((i) => (
-          <div key={i} className="bg-white p-6 rounded-lg shadow border animate-pulse">
-            <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
-            <div className="h-8 bg-gray-200 rounded w-1/2 mb-2"></div>
-            <div className="h-3 bg-gray-200 rounded w-1/3"></div>
-          </div>
-        ))}
-      </div>
-    )
-  }
-
-  // Se houver erro, mostrar mensagem de erro
-  if (error) {
-    return (
-      <div className="bg-red-50 border border-red-200 rounded-lg p-6">
-        <h3 className="text-lg font-semibold text-red-800 mb-2">Erro ao carregar dados</h3>
-        <p className="text-red-600">{error}</p>
-        <button 
-          onClick={() => window.location.reload()} 
-          className="mt-4 bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
-        >
-          Tentar novamente
-        </button>
-      </div>
-    )
-  }
+  // Carregar animação Lottie
+  useEffect(() => {
+    const loadAnimation = async () => {
+      try {
+        const animation = await import('../assets/Making Money.json')
+        setMakingMoneyAnimation(animation.default)
+      } catch (error) {
+        console.warn('⚠️ Erro ao carregar animação Making Money:', error)
+      }
+    }
+    loadAnimation()
+  }, [])
 
   // Função para calcular dados do resumo
   const calculateSummaryData = (transactions: Transaction[]): SummaryData => {
@@ -93,18 +77,8 @@ const SummaryCards = () => {
       .filter(t => t.type === 'despesa')
       .reduce((sum, t) => sum + t.amount, 0)
 
-    // Calcular saldo atual (apenas transações não pagas)
-    const unpaidTransactions = transactions.filter(t => !t.isPaid)
-    
-    const totalRevenue = unpaidTransactions
-      .filter(t => t.type === 'receita')
-      .reduce((sum, t) => sum + t.amount, 0)
-
-    const totalExpense = unpaidTransactions
-      .filter(t => t.type === 'despesa')
-      .reduce((sum, t) => sum + t.amount, 0)
-
-    const currentBalance = totalRevenue - totalExpense
+    // Calcular saldo atual (apenas transações não pagas do mês atual)
+    const currentBalance = currentMonthRevenue - currentMonthExpense
 
     // Calcular percentuais de variação
     const revenuePercentage = previousMonthRevenue > 0 
@@ -152,7 +126,6 @@ const SummaryCards = () => {
     return calculateSummaryData(transactions)
   }, [transactions])
 
-
   // Função para formatar valores monetários
   const formatCurrency = (value: number): string => {
     return new Intl.NumberFormat('pt-BR', {
@@ -167,6 +140,7 @@ const SummaryCards = () => {
     return `${sign}${value.toFixed(1)}%`
   }
 
+  // Se estiver carregando, mostrar loading
   if (loading) {
     return (
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
@@ -210,17 +184,39 @@ const SummaryCards = () => {
         <div className="bg-white p-4 rounded-xl shadow-lg border-2 border-gray-200">
           <div className="text-center">
             <h3 className="text-sm font-medium text-gray-600 mb-2">Saldo Atual</h3>
-            <div className="flex items-center justify-center space-x-2">
+            <div className="relative flex items-center justify-center">
               <p className={`text-3xl font-black ${
                 summaryData.currentBalance >= 0 ? 'text-green-700' : 'text-red-700'
               }`}>
                 {summaryData.currentBalance >= 0 ? '+' : ''}{formatCurrency(summaryData.currentBalance)}
               </p>
               {summaryData.currentBalance < 0 && (
-                <span className="text-red-600 text-2xl">⚠️</span>
+                <div className="absolute right-0 w-16 h-16 flex items-center justify-center">
+                  {makingMoneyAnimation ? (
+                    <Lottie 
+                      animationData={makingMoneyAnimation}
+                      loop={true}
+                      autoplay={true}
+                      style={{ width: '64px', height: '64px' }}
+                    />
+                  ) : (
+                    <span className="text-red-600 text-6xl">⚠️</span>
+                  )}
+                </div>
               )}
               {summaryData.currentBalance >= 0 && (
-                <span className="text-green-600 text-2xl">📈</span>
+                <div className="absolute right-0 w-16 h-16 flex items-center justify-center">
+                  {makingMoneyAnimation ? (
+                    <Lottie 
+                      animationData={makingMoneyAnimation}
+                      loop={true}
+                      autoplay={true}
+                      style={{ width: '64px', height: '64px' }}
+                    />
+                  ) : (
+                    <span className="text-green-600 text-6xl">📈</span>
+                  )}
+                </div>
               )}
             </div>
           </div>
@@ -228,20 +224,17 @@ const SummaryCards = () => {
         
         {/* Receitas e Despesas - Cards com equilíbrio diferenciado */}
         <div className="flex space-x-3">
-          {/* Receitas - Fundo mais claro */}
-          <div className="bg-gradient-to-br from-green-50 to-white p-4 rounded-xl shadow border-2 border-green-100 flex-1">
-            <div className="text-center mb-3">
+          {/* Receitas - Fundo branco */}
+          <div className="bg-white p-3 rounded-xl shadow border border-gray-200 flex-1">
+            <div className="text-center mb-2">
               <h3 className="text-xs font-medium text-green-600 mb-1">Receitas</h3>
-              <div className="flex items-center justify-center space-x-1 mb-2">
-                <span className="text-lg">💰</span>
-              </div>
-              <p className="text-2xl font-black text-green-700">
+              <p className="text-xl font-black text-green-700">
                 {formatCurrency(summaryData.currentMonthRevenue)}
               </p>
             </div>
             
-            {/* Mini barra de progresso mais grossa */}
-            <div className="mt-3">
+            {/* Mini barra de progresso mais grossa - Ocultada no mobile */}
+            <div className="mt-3 hidden lg:block">
               <div className="w-full bg-gray-200 rounded-full h-2.5">
                 <div 
                   className="bg-gradient-to-r from-green-400 to-green-500 h-2.5 rounded-full transition-all duration-500" 
@@ -258,20 +251,17 @@ const SummaryCards = () => {
             </div>
           </div>
           
-          {/* Despesas - Fundo mais forte */}
-          <div className="bg-gradient-to-br from-red-100 to-red-50 p-4 rounded-xl shadow border-2 border-red-200 flex-1">
-            <div className="text-center mb-3">
+          {/* Despesas - Fundo branco */}
+          <div className="bg-white p-3 rounded-xl shadow border border-gray-200 flex-1">
+            <div className="text-center mb-2">
               <h3 className="text-xs font-medium text-red-600 mb-1">Despesas</h3>
-              <div className="flex items-center justify-center space-x-1 mb-2">
-                <span className="text-lg">📉</span>
-              </div>
-              <p className="text-2xl font-black text-red-700">
+              <p className="text-xl font-black text-red-700">
                 {formatCurrency(summaryData.currentMonthExpense)}
               </p>
             </div>
             
-            {/* Mini barra de progresso mais grossa */}
-            <div className="mt-3">
+            {/* Mini barra de progresso mais grossa - Ocultada no mobile */}
+            <div className="mt-3 hidden lg:block">
               <div className="w-full bg-gray-200 rounded-full h-2.5">
                 <div 
                   className="bg-gradient-to-r from-red-400 to-red-500 h-2.5 rounded-full transition-all duration-500" 
