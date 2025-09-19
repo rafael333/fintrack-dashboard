@@ -33,3 +33,4 @@ export default defineConfig({
     include: ['firebase/app', 'firebase/auth', 'firebase/firestore']
   }
 })
+

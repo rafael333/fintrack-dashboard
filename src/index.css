@@ -317,6 +317,20 @@
     scroll-snap-align: start;
     scroll-snap-stop: normal;
   }
+
+  /* Emoji Picker Custom Styles */
+  .emoji-picker-container section {
+    padding: 0 !important;
+  }
+  
+  .emoji-picker-container .padding-lr {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+  
+  .emoji-picker-container .padding {
+    padding: 0 !important;
+  }
 }
 
 @layer components {
@@ -453,5 +467,56 @@
 .mobile-carousel-item:hover {
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* Animações para barra de progresso */
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes wave {
+  0%, 100% {
+    transform: translateX(-100%) skewX(-12deg);
+  }
+  50% {
+    transform: translateX(100%) skewX(-12deg);
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-2px);
+  }
+}
+
+.animation-delay-1000 {
+  animation-delay: 1s;
+}
+
+.animation-delay-2000 {
+  animation-delay: 2s;
+}
+
+/* Efeito de shimmer na barra de progresso */
+.progress-shimmer {
+  animation: shimmer 2s ease-in-out infinite;
+}
+
+/* Efeito de onda na barra de progresso */
+.progress-wave {
+  animation: wave 3s ease-in-out infinite;
+}
+
+/* Efeito de flutuação para partículas */
+.progress-float {
+  animation: float 2s ease-in-out infinite;
 }
 

@@ -5,11 +5,6 @@ import {
   CreditCard, 
   Calculator
 } from 'lucide-react'
-import Lottie from 'lottie-react'
-import { useState, useEffect } from 'react'
-import walletAnimation from '../assets/Flying Wallet Money.json'
-import customisedReportAnimation from '../assets/Customised report.json'
-import gearsAnimation from '../assets/Gears Lottie Animation.json'
 
 interface SidebarProps {
   activeTab: string
@@ -17,118 +12,32 @@ interface SidebarProps {
 }
 
 const Sidebar = ({ activeTab, onTabChange }: SidebarProps) => {
-  const [homeIconData, setHomeIconData] = useState(null)
-  const [shouldAnimate, setShouldAnimate] = useState(false)
-  const [shouldAnimateWallet, setShouldAnimateWallet] = useState(false)
-  const [shouldAnimateChart, setShouldAnimateChart] = useState(false)
-  const [shouldAnimateGears, setShouldAnimateGears] = useState(false)
 
-  useEffect(() => {
-    fetch('/home-icon.json')
-      .then(response => response.json())
-      .then(data => setHomeIconData(data))
-      .catch(error => console.error('Erro ao carregar ícone:', error))
-  }, [])
 
   const handleTabChange = (tab: string) => {
     onTabChange(tab)
   }
 
   const handleDashboardClick = () => {
-    if (activeTab === 'dashboard') {
-      // Se já está no dashboard, executar animação
-      setShouldAnimate(true)
-    } else {
-      // Se não está no dashboard, apenas navegar
-      handleTabChange('dashboard')
-    }
+    handleTabChange('dashboard')
   }
 
   const handleTransactionsClick = () => {
-    if (activeTab === 'transactions') {
-      // Se já está nas transações, executar animação
-      setShouldAnimateWallet(true)
-    } else {
-      // Se não está nas transações, apenas navegar
-      handleTabChange('transactions')
-    }
+    handleTabChange('transactions')
   }
 
   const handleReportsClick = () => {
-    if (activeTab === 'budgets') {
-      // Se já está nos relatórios, executar animação
-      setShouldAnimateChart(true)
-    } else {
-      // Se não está nos relatórios, apenas navegar
-      handleTabChange('budgets')
-    }
+    handleTabChange('budgets')
   }
 
   const handleSettingsClick = () => {
-    if (activeTab === 'settings') {
-      // Se já está nas configurações, executar animação
-      setShouldAnimateGears(true)
-    } else {
-      // Se não está nas configurações, apenas navegar
-      handleTabChange('settings')
-    }
+    handleTabChange('settings')
   }
 
-  // Resetar animação quando sair do dashboard
-  useEffect(() => {
-    if (activeTab !== 'dashboard') {
-      setShouldAnimate(false)
-    }
-  }, [activeTab])
 
-  // Executar animação quando estiver no dashboard
-  useEffect(() => {
-    if (activeTab === 'dashboard') {
-      setShouldAnimate(true)
-    }
-  }, [activeTab])
 
-  // Resetar animação da carteira quando sair das transações
-  useEffect(() => {
-    if (activeTab !== 'transactions') {
-      setShouldAnimateWallet(false)
-    }
-  }, [activeTab])
 
-  // Executar animação da carteira quando estiver nas transações
-  useEffect(() => {
-    if (activeTab === 'transactions') {
-      setShouldAnimateWallet(true)
-    }
-  }, [activeTab])
 
-  // Resetar animação dos relatórios quando sair dos relatórios
-  useEffect(() => {
-    if (activeTab !== 'budgets') {
-      setShouldAnimateChart(false)
-    }
-  }, [activeTab])
-
-  // Executar animação dos relatórios quando estiver nos relatórios
-  useEffect(() => {
-    if (activeTab === 'budgets') {
-      setShouldAnimateChart(true)
-    }
-  }, [activeTab])
-
-  // Resetar animação das configurações quando sair das configurações
-  useEffect(() => {
-    if (activeTab !== 'settings') {
-      setShouldAnimateGears(false)
-    }
-  }, [activeTab])
-
-  // Executar animação das configurações quando estiver nas configurações
-  useEffect(() => {
-    if (activeTab === 'settings') {
-      setShouldAnimateGears(true)
-    }
-  }, [activeTab])
 
   return (
     <>
@@ -152,16 +61,11 @@ const Sidebar = ({ activeTab, onTabChange }: SidebarProps) => {
               }`}
             >
               <div className="w-6 h-6">
-                {homeIconData ? (
-                  <Lottie 
-                    animationData={homeIconData}
-                    loop={false}
-                    autoplay={shouldAnimate}
-                    style={{ width: '24px', height: '24px' }}
-                  />
-                ) : (
-                  <span>📊</span>
-                )}
+                <img 
+                  src="/home.png" 
+                  alt="Dashboard" 
+                  className="w-6 h-6"
+                />
               </div>
               <span className="font-medium">Dashboard</span>
             </button>
@@ -175,11 +79,10 @@ const Sidebar = ({ activeTab, onTabChange }: SidebarProps) => {
               }`}
             >
               <div className="w-6 h-6 flex items-center justify-center">
-                <Lottie
-                  animationData={walletAnimation}
-                  loop={shouldAnimateWallet}
-                  autoplay={shouldAnimateWallet}
-                  style={{ width: 24, height: 24 }}
+                <img 
+                  src="/money-bag.png" 
+                  alt="Transações" 
+                  className="w-6 h-6"
                 />
               </div>
               <span className="font-medium">Transações</span>
@@ -194,11 +97,10 @@ const Sidebar = ({ activeTab, onTabChange }: SidebarProps) => {
               }`}
             >
               <div className="w-6 h-6 flex items-center justify-center">
-                <Lottie
-                  animationData={customisedReportAnimation}
-                  loop={shouldAnimateChart}
-                  autoplay={shouldAnimateChart}
-                  style={{ width: 24, height: 24 }}
+                <img 
+                  src="/research.png" 
+                  alt="Relatórios" 
+                  className="w-6 h-6"
                 />
               </div>
               <span className="font-medium">Relatórios</span>
@@ -213,11 +115,10 @@ const Sidebar = ({ activeTab, onTabChange }: SidebarProps) => {
               }`}
             >
               <div className="w-6 h-6 flex items-center justify-center">
-                <Lottie
-                  animationData={gearsAnimation}
-                  loop={shouldAnimateGears}
-                  autoplay={shouldAnimateGears}
-                  style={{ width: 24, height: 24 }}
+                <img 
+                  src="/settings.png" 
+                  alt="Configurações" 
+                  className="w-6 h-6"
                 />
               </div>
               <span className="font-medium">Configurações</span>
@@ -251,16 +152,11 @@ const Sidebar = ({ activeTab, onTabChange }: SidebarProps) => {
               }`}
             >
               <div className="w-7 h-7">
-                {homeIconData ? (
-                  <Lottie 
-                    animationData={homeIconData}
-                    loop={false}
-                    autoplay={shouldAnimate}
-                    style={{ width: '28px', height: '28px' }}
-                  />
-                ) : (
-                  <span className="text-lg">📊</span>
-                )}
+                <img 
+                  src="/home.png" 
+                  alt="Dashboard" 
+                  className="w-7 h-7"
+                />
               </div>
               <span className="text-xs font-medium">Dashboard</span>
             </button>
@@ -274,17 +170,16 @@ const Sidebar = ({ activeTab, onTabChange }: SidebarProps) => {
               }`}
             >
               <div className="w-7 h-7 flex items-center justify-center">
-                <Lottie
-                  animationData={walletAnimation}
-                  loop={shouldAnimateWallet}
-                  autoplay={shouldAnimateWallet}
-                  style={{ width: 28, height: 28 }}
+                <img 
+                  src="/money-bag.png" 
+                  alt="Transações" 
+                  className="w-7 h-7"
                 />
               </div>
               <span className="text-xs font-medium">Transações</span>
             </button>
             
-            <button 
+            <button
               onClick={handleReportsClick}
               className={`flex flex-col items-center space-y-1 px-3 py-2 rounded-lg transition-colors ${
                 activeTab === 'budgets' 
@@ -293,11 +188,10 @@ const Sidebar = ({ activeTab, onTabChange }: SidebarProps) => {
               }`}
             >
               <div className="w-7 h-7 flex items-center justify-center">
-                <Lottie
-                  animationData={customisedReportAnimation}
-                  loop={shouldAnimateChart}
-                  autoplay={shouldAnimateChart}
-                  style={{ width: 28, height: 28 }}
+                <img 
+                  src="/research.png" 
+                  alt="Relatórios" 
+                  className="w-7 h-7"
                 />
               </div>
               <span className="text-xs font-medium">Relatórios</span>
@@ -312,11 +206,10 @@ const Sidebar = ({ activeTab, onTabChange }: SidebarProps) => {
               }`}
             >
               <div className="w-7 h-7 flex items-center justify-center">
-                <Lottie
-                  animationData={gearsAnimation}
-                  loop={shouldAnimateGears}
-                  autoplay={shouldAnimateGears}
-                  style={{ width: 28, height: 28 }}
+                <img 
+                  src="/settings.png" 
+                  alt="Configurações" 
+                  className="w-7 h-7"
                 />
               </div>
               <span className="text-xs font-medium">Configurações</span>

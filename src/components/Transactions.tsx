@@ -721,17 +721,17 @@ const Transactions = () => {
               className="lg:hidden flex items-center space-x-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 text-gray-600 hover:text-gray-900 hover:bg-gray-100"
             >
               <img 
-                src="/configuration-settings-gear-options-preferences-setting-tools-svgrepo-com.svg" 
+                src="/options.png" 
                 alt="Configurações" 
                 className="w-4 h-4"
               />
-              <span>Filtros Avançados</span>
+              <span>Filtros</span>
             </button>
 
             {/* Campo de Busca - Desktop */}
             <div className="relative max-w-[200px] lg:max-w-none hidden lg:block">
               <img 
-                src="/configuration-settings-gear-options-preferences-setting-tools-svgrepo-com.svg" 
+                src="/options.png" 
                 alt="Buscar" 
                 className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400"
               />
@@ -762,7 +762,7 @@ const Transactions = () => {
           <div className="mb-4 lg:hidden">
             <div className="relative">
               <img 
-                src="/configuration-settings-gear-options-preferences-setting-tools-svgrepo-com.svg" 
+                src="/options.png" 
                 alt="Buscar" 
                 className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400"
               />
@@ -808,6 +808,16 @@ const Transactions = () => {
           {/* Carrossel de Filtros - Mobile */}
           <div className="lg:hidden">
             <div className="flex overflow-x-auto scrollbar-hide space-x-2 pb-2">
+              <button
+                onClick={() => setActiveTagFilter('all')}
+                className={`flex-shrink-0 px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
+                  activeTagFilter === 'all'
+                    ? 'bg-blue-100 text-blue-700 border border-blue-200'
+                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                }`}
+              >
+                Todas
+              </button>
               <button
                 onClick={() => setActiveTagFilter('pending')}
                 className={`flex-shrink-0 px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
@@ -856,16 +866,6 @@ const Transactions = () => {
                 }`}
               >
                 Maiores Receitas
-              </button>
-              <button
-                onClick={() => setActiveTagFilter('all')}
-                className={`flex-shrink-0 px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
-                  activeTagFilter === 'all'
-                    ? 'bg-blue-100 text-blue-700 border border-blue-200'
-                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                }`}
-              >
-                Todas
               </button>
             </div>
           </div>
@@ -938,7 +938,7 @@ const Transactions = () => {
               className="flex items-center space-x-2 px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 text-gray-600 hover:text-gray-900 hover:bg-gray-100"
             >
               <img 
-                src="/configuration-settings-gear-options-preferences-setting-tools-svgrepo-com.svg" 
+                src="/options.png" 
                 alt="Configurações" 
                 className="w-4 h-4"
               />
@@ -1346,6 +1346,9 @@ const Transactions = () => {
                       }`}>
                         {transaction.type === 'receita' ? 'Receita' : 'Despesa'}
                       </span>
+                    </td>
+                    <td className="py-3 lg:py-4 px-1 lg:px-4 text-center hidden lg:table-cell">
+                      {/* Campo vazio para transações não parceladas */}
                     </td>
                     <td className="py-3 lg:py-4 px-1 lg:px-4 text-center">
                       <div className="flex flex-col items-center space-y-0 lg:space-y-2">

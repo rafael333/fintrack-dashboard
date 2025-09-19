@@ -160,6 +160,9 @@ const NewTransactionModal = ({ isOpen, onClose, userId, onTransactionCreating }:
     }
 
     try {
+      console.log('🚀 [NewTransactionModal] Iniciando criação de transação...')
+      console.log('📊 [NewTransactionModal] Dados do formulário:', formData)
+      
       // Notificar que está criando transação
       onTransactionCreating?.(true)
       
@@ -175,12 +178,21 @@ const NewTransactionModal = ({ isOpen, onClose, userId, onTransactionCreating }:
       
       // Validar se a data é válida
       if (isNaN(startDate.getTime())) {
+        console.error('❌ [NewTransactionModal] Data inválida:', dueDateValue)
         alert('Por favor, selecione uma data válida.')
         return
       }
       
+      console.log('📅 [NewTransactionModal] Data processada:', {
+        input: dueDateValue,
+        parsed: startDate,
+        localString: startDate.toLocaleDateString('pt-BR'),
+        isoString: startDate.toISOString()
+      })
+      
       if (isInstallment && formData.installments > 1) {
         // Criar múltiplas transações para parcelas
+        console.log(`📦 [NewTransactionModal] Criando ${formData.installments} transações parceladas...`)
         
         const transactionPromises = []
         const installmentGroupId = `installment_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
@@ -270,6 +282,7 @@ const NewTransactionModal = ({ isOpen, onClose, userId, onTransactionCreating }:
       
     } catch (error) {
       console.error('❌ [NewTransactionModal] Erro ao criar transação:', error)
+      console.error('❌ [NewTransactionModal] Stack trace:', error instanceof Error ? error.stack : 'N/A')
       
       // Notificar que terminou de criar transação (mesmo com erro)
       onTransactionCreating?.(false)
@@ -366,9 +379,8 @@ const NewTransactionModal = ({ isOpen, onClose, userId, onTransactionCreating }:
   // Fechar pickers quando clicar fora
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      // Emoji picker desktop
-      if (emojiPickerRef.current && !emojiPickerRef.current.contains(event.target as Node) && 
-          emojiButtonRef.current && !emojiButtonRef.current.contains(event.target as Node)) {
+      // Emoji picker - fechar quando clicar no backdrop
+      if (showEmojiPicker && emojiPickerRef.current && !emojiPickerRef.current.contains(event.target as Node)) {
         setShowEmojiPicker(false)
       }
       
@@ -381,30 +393,30 @@ const NewTransactionModal = ({ isOpen, onClose, userId, onTransactionCreating }:
 
     document.addEventListener('mousedown', handleClickOutside)
     return () => document.removeEventListener('mousedown', handleClickOutside)
-  }, [])
+  }, [showEmojiPicker])
 
   if (!isOpen) return null
 
   return (
-    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[9999] p-1 sm:p-4 animate-in fade-in duration-200">
-      <div className="bg-white rounded-xl sm:rounded-3xl shadow-2xl w-full max-w-6xl max-h-[98vh] sm:max-h-[95vh] overflow-hidden animate-in zoom-in-95 duration-200">
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-start sm:items-center justify-center z-[9999] p-1 sm:p-4 animate-in fade-in duration-200 overflow-y-auto">
+      <div className="bg-white rounded-lg sm:rounded-3xl shadow-2xl w-full max-w-6xl max-h-[98vh] sm:max-h-[95vh] flex flex-col animate-in zoom-in-95 duration-200 scroll-smooth">
         {/* Header */}
-        <div className="bg-gradient-to-r from-green-50 to-emerald-50 p-3 sm:p-6 border-b border-gray-100">
+        <div className="bg-gradient-to-r from-green-50 to-emerald-50 p-4 sm:p-6 border-b border-gray-100">
           <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-2 sm:space-x-3">
-              <div className="w-7 h-7 sm:w-10 sm:h-10 bg-gradient-to-r from-green-500 to-emerald-500 rounded-lg sm:rounded-xl flex items-center justify-center">
-                <span className="text-white text-sm sm:text-xl">💰</span>
+            <div className="flex items-center space-x-3 sm:space-x-3">
+              <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-r from-green-500 to-emerald-500 rounded-lg sm:rounded-xl flex items-center justify-center">
+                <span className="text-white text-base sm:text-xl">💰</span>
               </div>
               <div>
-                <h3 className="text-base sm:text-2xl font-bold text-gray-900">Nova Transação</h3>
-                <p className="text-xs sm:text-sm text-gray-600 hidden sm:block">Registre sua movimentação financeira</p>
+                <h3 className="text-2xl sm:text-2xl font-bold text-gray-900">Nova Transação</h3>
+                <p className="text-sm sm:text-sm text-gray-600 hidden sm:block">Registre sua movimentação financeira</p>
               </div>
             </div>
             <button
               onClick={onClose}
-              className="p-1.5 sm:p-2 hover:bg-white/80 rounded-lg sm:rounded-xl transition-all duration-200 hover:scale-105 group"
+              className="p-2 sm:p-2 hover:bg-white/80 rounded-lg sm:rounded-xl transition-all duration-200 hover:scale-105 group"
             >
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4 sm:w-6 sm:h-6 text-gray-500 group-hover:text-gray-700">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5 sm:w-6 sm:h-6 text-gray-500 group-hover:text-gray-700">
                 <path d="M18 6 6 18"></path>
                 <path d="m6 6 12 12"></path>
               </svg>
@@ -412,54 +424,33 @@ const NewTransactionModal = ({ isOpen, onClose, userId, onTransactionCreating }:
           </div>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-2 sm:p-8">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-2 sm:gap-8">
+        <form onSubmit={handleSubmit} className="p-2 sm:p-8 flex-1 overflow-y-auto">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-8">
             {/* Coluna Principal */}
             <div className="lg:col-span-2">
               {/* Card Principal com todos os campos */}
-              <div className="bg-gray-50 rounded-xl sm:rounded-2xl p-3 sm:p-6 space-y-3 sm:space-y-6 max-h-[70vh] sm:max-h-[75vh] overflow-y-auto">
+              <div className="bg-gray-50 rounded-lg sm:rounded-2xl p-2 sm:p-6 space-y-3 sm:space-y-6">
                 {/* SEÇÃO 1: Informações da Transação */}
                 <div className="bg-white rounded-lg p-2 sm:p-3 shadow-sm border border-gray-200">
-                  <div className="flex items-center space-x-2 mb-2 sm:mb-3">
-                    <div className="w-5 h-5 sm:w-6 sm:h-6 bg-blue-100 rounded-md flex items-center justify-center">
-                      <span className="text-blue-600 text-xs sm:text-sm">📋</span>
+                  <div className="flex items-center space-x-2 mb-4 sm:mb-3">
+                    <div className="hidden sm:flex w-6 h-6 bg-blue-100 rounded-md items-center justify-center">
+                      <span className="text-blue-600 text-sm">📋</span>
                     </div>
-                    <h3 className="text-xs sm:text-sm font-bold text-gray-900">Informações da Transação</h3>
+                    <h3 className="text-sm sm:text-sm font-semibold text-gray-600">Dados Básicos</h3>
                   </div>
                   
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-2 sm:gap-3">
-                    {/* Descrição */}
-                    <div className="md:col-span-2">
-                      <label className="block text-xs font-semibold text-gray-700 mb-2 flex items-center space-x-1">
-                        <span className="w-1.5 h-1.5 bg-blue-500 rounded-full"></span>
-                        <span>Descrição</span>
-                      </label>
-                      <div className="relative">
-                        <input
-                          type="text"
-                          placeholder="Ex: Supermercado, Salário..."
-                          className="w-full px-2 sm:px-3 py-1.5 sm:py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-gray-50 focus:bg-white text-xs sm:text-sm"
-                          value={formData.description}
-                          onChange={(e) => setFormData({...formData, description: e.target.value})}
-                        />
-                        <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
-                          <span className="text-gray-400 text-xs">📝</span>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Valor */}
+                  <div className="space-y-3">
+                    {/* Valor - Campo Principal */}
                     <div>
-                      <label className="block text-xs font-semibold text-gray-700 mb-2 flex items-center space-x-1">
-                        <span className="w-1.5 h-1.5 bg-green-500 rounded-full"></span>
-                        <span>Valor*</span>
+                      <label className="block text-base font-bold text-gray-900 mb-2">
+                        Valor*
                       </label>
                       <div className="relative">
-                        <span className="absolute left-2 sm:left-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-xs sm:text-sm font-medium">R$</span>
+                        <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-600 text-lg font-bold">R$</span>
                         <input
                           type="text"
                           placeholder="0,00"
-                          className="w-full pl-6 sm:pl-8 pr-2 sm:pr-3 py-1.5 sm:py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-green-500 focus:border-transparent transition-all duration-200 bg-gray-50 focus:bg-white text-xs sm:text-sm"
+                          className="w-full pl-10 pr-3 py-3 border-2 border-green-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-100 focus:border-green-500 transition-all duration-200 bg-green-50 focus:bg-white text-xl font-bold text-gray-900 shadow-md"
                           value={formData.amount}
                           onChange={(e) => {
                             // Máscara de moeda automática
@@ -477,21 +468,39 @@ const NewTransactionModal = ({ isOpen, onClose, userId, onTransactionCreating }:
                       </div>
                     </div>
 
-                    {/* Data de Vencimento */}
+                    {/* Descrição */}
                     <div>
-                      <label className="block text-xs font-semibold text-gray-700 mb-2 flex items-center space-x-1">
-                        <span className="w-1.5 h-1.5 bg-purple-500 rounded-full"></span>
-                        <span>Data</span>
+                      <label className="block text-sm font-medium text-gray-500 mb-2">
+                        Descrição
+                      </label>
+                      <div className="relative">
+                        <input
+                          type="text"
+                          placeholder="Ex: Supermercado, Salário..."
+                          className="w-full px-3 sm:px-3 py-2.5 sm:py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-gray-50 focus:bg-white text-sm sm:text-sm"
+                          value={formData.description}
+                          onChange={(e) => setFormData({...formData, description: e.target.value})}
+                        />
+                        <div className="absolute inset-y-0 right-0 pr-3 hidden sm:flex items-center">
+                          <span className="text-gray-400 text-sm">📝</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Data */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-500 mb-2">
+                        Data
                       </label>
                       <div className="relative">
                         <input
                           type="date"
-                          className="w-full px-2 sm:px-3 py-1.5 sm:py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-purple-500 focus:border-transparent transition-all duration-200 bg-gray-50 focus:bg-white text-xs sm:text-sm"
+                          className="w-full px-3 sm:px-3 py-2.5 sm:py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200 bg-gray-50 focus:bg-white text-sm sm:text-sm"
                           value={formData.dueDate}
                           onChange={(e) => setFormData({...formData, dueDate: e.target.value})}
                         />
-                        <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
-                          <span className="text-gray-400 text-xs">📅</span>
+                        <div className="absolute inset-y-0 right-0 pr-3 hidden sm:flex items-center">
+                          <span className="text-gray-400 text-sm">📅</span>
                         </div>
                       </div>
                     </div>
@@ -499,15 +508,15 @@ const NewTransactionModal = ({ isOpen, onClose, userId, onTransactionCreating }:
 
                   {/* Parcelamento */}
                   <div className="mt-2 sm:mt-3">
-                    <div className="flex items-center space-x-2 mb-2">
+                    <div className="flex items-center space-x-2 mb-1">
                       <input
                         type="checkbox"
                         id="installment"
                         checked={isInstallment}
                         onChange={(e) => setIsInstallment(e.target.checked)}
-                        className="w-3 h-3 sm:w-4 sm:h-4 text-green-600 bg-gray-100 border-gray-300 rounded focus:ring-green-500 focus:ring-1"
+                        className="w-4 h-4 sm:w-4 sm:h-4 text-green-600 bg-gray-100 border-gray-300 rounded focus:ring-green-500 focus:ring-2"
                       />
-                      <label htmlFor="installment" className="text-xs font-semibold text-gray-700 cursor-pointer">
+                      <label htmlFor="installment" className="text-sm font-medium text-gray-500 cursor-pointer">
                         Parcelar transação
                       </label>
                     </div>
@@ -523,8 +532,24 @@ const NewTransactionModal = ({ isOpen, onClose, userId, onTransactionCreating }:
                               type="number"
                               min="2"
                               max="60"
-                              value={formData.installments || 2}
-                              onChange={(e) => setFormData({...formData, installments: parseInt(e.target.value) || 2})}
+                              value={formData.installments || ''}
+                              onChange={(e) => {
+                                const value = e.target.value;
+                                if (value === '') {
+                                  setFormData({...formData, installments: undefined});
+                                } else {
+                                  const numValue = parseInt(value);
+                                  if (numValue >= 2 && numValue <= 60) {
+                                    setFormData({...formData, installments: numValue});
+                                  }
+                                }
+                              }}
+                              onBlur={(e) => {
+                                if (e.target.value === '' || parseInt(e.target.value) < 2) {
+                                  setFormData({...formData, installments: 2});
+                                }
+                              }}
+                              placeholder="2"
                               className="w-full px-2 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-green-500 focus:border-transparent text-sm"
                             />
                           </div>
@@ -544,58 +569,48 @@ const NewTransactionModal = ({ isOpen, onClose, userId, onTransactionCreating }:
 
 
                 {/* SEÇÃO 2: Tipo de Transação */}
-                <div className="bg-white rounded-lg p-3 shadow-sm border border-gray-200">
-                  <div className="flex items-center space-x-2 mb-3">
-                    <div className="w-6 h-6 bg-purple-100 rounded-md flex items-center justify-center">
+                <div className="bg-white rounded-lg p-2 sm:p-3 shadow-sm border border-gray-200">
+                  <div className="flex items-center space-x-2 mb-4">
+                    <div className="hidden sm:flex w-6 h-6 bg-purple-100 rounded-md items-center justify-center">
                       <span className="text-purple-600 text-sm">🔄</span>
                     </div>
-                    <h3 className="text-sm font-bold text-gray-900">Tipo de Transação</h3>
+                    <h3 className="text-sm font-semibold text-gray-600">Tipo de Transação</h3>
                   </div>
                   
-                  <div className="grid grid-cols-2 gap-2">
+                  <div className="grid grid-cols-2 gap-3 sm:gap-3">
                     <button
                       type="button"
                       onClick={() => setFormData({...formData, type: 'Receita'})}
-                      className={`p-2 rounded-md border transition-all duration-200 transform hover:scale-105 ${
-                        formData.type === 'Receita'
-                          ? 'border-green-500 bg-green-50 shadow-sm'
-                          : 'border-gray-200 bg-white hover:border-green-300 hover:shadow-sm'
+                      className={`p-4 sm:p-3 rounded-xl border-2 transition-all duration-200 transform hover:scale-105 ${
+                        formData.type === 'Receita' 
+                          ? 'border-green-500 bg-green-500 shadow-lg' 
+                          : 'border-green-300 bg-green-50 hover:border-green-400 hover:shadow-md'
                       }`}
                     >
-                      <div className="flex items-center space-x-2">
-                        <div className={`w-5 h-5 rounded-full flex items-center justify-center ${
-                          formData.type === 'Receita' ? 'bg-green-500' : 'bg-gray-100'
-                        }`}>
-                          <span className="text-xs">💹</span>
-                        </div>
+                      <div className="flex items-center justify-center">
                         <div className="text-left">
-                          <div className={`text-xs font-bold ${
-                            formData.type === 'Receita' ? 'text-green-700' : 'text-gray-700'
+                          <div className={`text-lg font-bold ${
+                            formData.type === 'Receita' ? 'text-white' : 'text-green-700'
                           }`}>
                             Receita
                           </div>
                         </div>
                       </div>
                     </button>
-                    
+
                     <button
                       type="button"
                       onClick={() => setFormData({...formData, type: 'Despesa'})}
-                      className={`p-2 rounded-md border transition-all duration-200 transform hover:scale-105 ${
-                        formData.type === 'Despesa'
-                          ? 'border-red-500 bg-red-50 shadow-sm'
-                          : 'border-gray-200 bg-white hover:border-red-300 hover:shadow-sm'
+                      className={`p-4 sm:p-3 rounded-xl border-2 transition-all duration-200 transform hover:scale-105 ${
+                        formData.type === 'Despesa' 
+                          ? 'border-red-500 bg-red-500 shadow-lg' 
+                          : 'border-red-300 bg-red-50 hover:border-red-400 hover:shadow-md'
                       }`}
                     >
-                      <div className="flex items-center space-x-2">
-                        <div className={`w-5 h-5 rounded-full flex items-center justify-center ${
-                          formData.type === 'Despesa' ? 'bg-red-500' : 'bg-gray-100'
-                        }`}>
-                          <span className="text-xs">📉</span>
-                        </div>
+                      <div className="flex items-center justify-center">
                         <div className="text-left">
-                          <div className={`text-xs font-bold ${
-                            formData.type === 'Despesa' ? 'text-red-700' : 'text-gray-700'
+                          <div className={`text-lg font-bold ${
+                            formData.type === 'Despesa' ? 'text-white' : 'text-red-700'
                           }`}>
                             Despesa
                           </div>
@@ -606,7 +621,7 @@ const NewTransactionModal = ({ isOpen, onClose, userId, onTransactionCreating }:
                 </div>
 
                 {/* Categorias */}
-                <div className="hidden sm:block bg-white rounded-xl p-3 sm:p-6 shadow-sm border border-gray-200 relative z-10">
+                <div className="hidden sm:block bg-white rounded-xl p-2.5 sm:p-6 shadow-sm border border-gray-200 relative z-10">
                   <div className="flex items-center justify-between mb-3 sm:mb-4">
                     <label className="block text-xs sm:text-sm font-semibold text-gray-700 flex items-center space-x-2">
                       <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-orange-500 rounded-full"></span>
@@ -651,7 +666,7 @@ const NewTransactionModal = ({ isOpen, onClose, userId, onTransactionCreating }:
                     <div className="hidden sm:block">
 
                     {/* Layout Desktop - Grid */}
-                    <div className="hidden sm:grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4 max-h-80 overflow-y-auto pr-2 pt-4 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 scrollbar-thumb-opacity-30 scrollbar-track-opacity-10">
+                    <div className="hidden sm:grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4 max-h-80 overflow-y-auto pr-2 pt-4 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 scroll-smooth">
                     {paginatedCategories.length > 0 ? (
                       paginatedCategories.map((category: any, index: number) => (
                         <div key={index} className="relative group">
@@ -793,37 +808,37 @@ const NewTransactionModal = ({ isOpen, onClose, userId, onTransactionCreating }:
           </div>
 
             {/* Coluna Lateral - Visualização e Configurações */}
-            <div className="space-y-4 lg:space-y-6">
+            <div className="space-y-3 lg:space-y-6">
               {/* Visualização Prévia Compacta */}
-              <div className="bg-white rounded-xl p-3 lg:p-6 shadow-sm border border-gray-200">
-                <div className="flex items-center justify-between mb-4 lg:mb-6">
-                  <div className="flex items-center space-x-2 lg:space-x-3">
-                    <div className="w-6 h-6 lg:w-8 lg:h-8 bg-blue-100 rounded-lg flex items-center justify-center">
-                      <span className="text-blue-600 text-sm lg:text-lg">👁️</span>
+                <div className="bg-gray-100 rounded-lg p-2 lg:p-4 border border-gray-200">
+                  <div className="flex items-center justify-between mb-2 lg:mb-3">
+                    <div className="flex items-center space-x-2 lg:space-x-3">
+                      <div className="hidden sm:flex w-5 h-5 lg:w-6 lg:h-6 bg-gray-300 rounded items-center justify-center">
+                        <span className="text-gray-400 text-xs lg:text-sm">👁️</span>
+                      </div>
+                      <h3 className="text-xs lg:text-sm font-medium text-gray-500">Pré-visualização</h3>
                     </div>
-                    <h3 className="text-base lg:text-lg font-bold text-gray-900">Visualização Prévia</h3>
+                    <button 
+                      type="button" 
+                      className="px-4 sm:px-5 py-2.5 sm:py-3 text-sm font-bold text-white bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 border-2 border-blue-400 hover:border-blue-500 rounded-xl transition-all duration-300 hover:scale-110 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 lg:hidden"
+                      onClick={() => setShowCategoryPicker(true)}
+                    >
+                      Categoria
+                    </button>
                   </div>
-                  <button 
-                    type="button" 
-                    className="px-2 sm:px-3 py-1 sm:py-1.5 text-xs font-semibold text-blue-600 bg-blue-100 hover:bg-blue-200 rounded-lg transition-all duration-200 hover:scale-105 shadow-sm hover:shadow-md lg:hidden"
-                    onClick={() => setShowCategoryPicker(true)}
-                  >
-                    📋 Selecionar Categoria
-                  </button>
-                </div>
                 
-                <div className="bg-gray-50 rounded-xl p-3 lg:p-4 mb-4 lg:mb-6">
+                <div className="bg-gray-50 rounded p-2 lg:p-3 mb-2 lg:mb-3 border border-gray-200">
                   {/* Ícone da categoria */}
-                  <div className="flex items-center space-x-2 lg:space-x-3 mb-3">
+                  <div className="flex items-center space-x-3 lg:space-x-4 mb-3">
                     <div 
-                      className="w-8 h-8 lg:w-10 lg:h-10 rounded-lg flex items-center justify-center shadow-sm" 
+                      className="w-10 h-10 lg:w-12 lg:h-12 rounded-lg flex items-center justify-center shadow-sm" 
                       style={{
                         backgroundColor: formData.category 
                           ? (firebaseCategories.find(cat => cat.name === formData.category)?.color || '#3B82F6')
-                          : '#9CA3AF'
+                          : '#D1D5DB'
                       }}
                     >
-                      <span className="text-sm lg:text-lg">
+                      <span className="text-lg lg:text-xl">
                         {formData.category 
                           ? (firebaseCategories.find(cat => cat.name === formData.category)?.icon || '📦')
                           : '📦'
@@ -831,22 +846,22 @@ const NewTransactionModal = ({ isOpen, onClose, userId, onTransactionCreating }:
                       </span>
                     </div>
                     <div className="flex-1 min-w-0">
-                      <div className="text-xs lg:text-sm font-semibold text-gray-800 truncate">
+                      <div className="text-sm lg:text-base font-semibold text-gray-700 truncate">
                         {formData.category || 'Categoria'}
                       </div>
                     </div>
                   </div>
                   
                   {/* Tipo e valor */}
-                  <div className="flex items-center justify-between mb-2">
-                    <span className={`px-2 py-1 text-xs font-semibold rounded-md ${
+                  <div className="flex items-center justify-between mb-1">
+                    <span className={`px-1.5 py-0.5 text-xs font-medium rounded ${
                       formData.type === 'Receita' 
-                        ? 'bg-green-100 text-green-700' 
-                        : 'bg-red-100 text-red-700'
+                        ? 'bg-green-50 text-green-500' 
+                        : 'bg-red-50 text-red-500'
                     }`}>
                       {formData.type}
                     </span>
-                    <div className={`text-sm lg:text-lg font-bold ${
+                    <div className={`text-sm lg:text-base font-semibold ${
                       formData.type === 'Receita' ? 'text-green-600' : 'text-red-600'
                     }`}>
                       {formData.type === 'Receita' ? '+' : '-'}R$ {formData.amount || '0,00'}
@@ -854,7 +869,7 @@ const NewTransactionModal = ({ isOpen, onClose, userId, onTransactionCreating }:
                   </div>
                   
                   {/* Data */}
-                  <div className="text-xs text-gray-500">
+                  <div className="text-xs text-gray-400">
                     {formData.dueDate}
                   </div>
                   
@@ -883,23 +898,23 @@ const NewTransactionModal = ({ isOpen, onClose, userId, onTransactionCreating }:
                   )}
                 </div>
 
-                {/* Botões de Ação */}
-                <div className="flex flex-col space-y-2 lg:space-y-3">
+                {/* Botões de Ação - Desktop */}
+                <div className="hidden lg:flex flex-col space-y-3 lg:space-y-3">
                   <button
                     type="button"
                     onClick={onClose}
-                    className="w-full px-3 lg:px-4 py-2.5 lg:py-3 text-sm lg:text-base text-gray-700 bg-white hover:bg-gray-50 rounded-xl font-semibold transition-all duration-200 border-2 border-gray-200 hover:border-gray-300 shadow-sm hover:shadow-md transform hover:scale-105"
+                    className="w-full px-4 lg:px-4 py-3 lg:py-3 text-base lg:text-base text-gray-700 bg-white hover:bg-gray-50 rounded-lg font-semibold transition-all duration-200 border-2 border-gray-200 hover:border-gray-300 shadow-sm hover:shadow-md transform hover:scale-105"
                   >
                     Cancelar
                   </button>
                   <button
                     type="submit"
                     disabled={transactionLoading}
-                    className="w-full px-3 lg:px-4 py-2.5 lg:py-3 bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 disabled:from-gray-400 disabled:to-gray-500 text-white rounded-xl font-semibold transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 disabled:transform-none disabled:cursor-not-allowed text-sm lg:text-base"
+                    className="w-full px-4 lg:px-4 py-3 lg:py-3 bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 disabled:from-gray-400 disabled:to-gray-500 text-white rounded-lg font-semibold transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 disabled:transform-none disabled:cursor-not-allowed text-base lg:text-base"
                   >
                     {transactionLoading ? (
                       <div className="flex items-center justify-center space-x-2">
-                        <div className="w-3 h-3 lg:w-4 lg:h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                        <div className="w-4 h-4 lg:w-4 lg:h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                         <span>Criando...</span>
                       </div>
                     ) : (
@@ -908,6 +923,33 @@ const NewTransactionModal = ({ isOpen, onClose, userId, onTransactionCreating }:
                   </button>
                 </div>
               </div>
+            </div>
+          </div>
+
+          {/* Botões Fixos no Mobile */}
+          <div className="lg:hidden mt-4 p-4 bg-white border-t border-gray-200">
+            <div className="flex flex-col space-y-3">
+              <button
+                type="button"
+                onClick={onClose}
+                className="w-full px-4 py-3 text-base text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-lg font-medium transition-all duration-200"
+              >
+                Cancelar
+              </button>
+              <button
+                type="submit"
+                disabled={transactionLoading}
+                className="w-full px-4 py-4 bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 disabled:from-gray-400 disabled:to-gray-500 text-white rounded-lg font-bold transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 disabled:transform-none disabled:cursor-not-allowed text-lg"
+              >
+                {transactionLoading ? (
+                  <div className="flex items-center justify-center space-x-2">
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                    <span>Criando...</span>
+                  </div>
+                ) : (
+                  'Adicionar Transação'
+                )}
+              </button>
             </div>
           </div>
 
@@ -1167,7 +1209,7 @@ const NewTransactionModal = ({ isOpen, onClose, userId, onTransactionCreating }:
             </div>
 
             {/* Categories List */}
-            <div className="p-4 max-h-[50vh] overflow-y-auto">
+            <div className="p-4 max-h-[50vh] overflow-y-auto scroll-smooth">
               {filteredCategories.length > 0 ? (
                 <div className="space-y-2">
                   {filteredCategories.map((category: any, index: number) => (
@@ -1281,26 +1323,28 @@ const NewTransactionModal = ({ isOpen, onClose, userId, onTransactionCreating }:
 
       {/* Emoji Picker */}
       {showEmojiPicker && (
-        <div 
-          ref={emojiPickerRef}
-          className="fixed z-[10001] shadow-2xl rounded-lg overflow-hidden bg-white border border-gray-200"
-          style={{ 
-            top: emojiButtonRef.current ? emojiButtonRef.current.getBoundingClientRect().bottom + window.scrollY + 10 : 0,
-            left: emojiButtonRef.current ? emojiButtonRef.current.getBoundingClientRect().left + window.scrollX : 0,
-            minWidth: '320px',
-            maxWidth: '90vw'
-          }}
-        >
-          <Picker
-            data={data}
-            onEmojiSelect={handleEmojiSelect}
-            theme="light"
-            previewPosition="none"
-            searchPosition="top"
-            skinTonePosition="none"
-            perLine={8}
-            maxFrequentRows={2}
-          />
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-[10001] p-4">
+          <div 
+            ref={emojiPickerRef}
+            className="emoji-picker-container bg-white rounded-lg shadow-2xl overflow-hidden border border-gray-200 w-full max-w-md max-h-[80vh]"
+            style={{
+              '--padding': '0px',
+              '--sidebar-width': '0px'
+            } as React.CSSProperties}
+          >
+            <div className="w-full h-full [&_section]:w-full [&_section]:!p-0 [&_.padding-lr]:!px-0 [&_.padding]:!p-0">
+              <Picker
+                data={data}
+                onEmojiSelect={handleEmojiSelect}
+                theme="light"
+                previewPosition="none"
+                searchPosition="top"
+                skinTonePosition="none"
+                perLine={8}
+                maxFrequentRows={2}
+              />
+            </div>
+          </div>
         </div>
       )}
     </div>

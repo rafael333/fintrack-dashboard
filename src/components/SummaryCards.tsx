@@ -205,31 +205,87 @@ const SummaryCards = () => {
   return (
     <div className="mb-1.5 lg:mb-6">
       {/* Mobile: Carrossel horizontal */}
-      <div className="lg:hidden space-y-2">
-        {/* Saldo Atual - Card principal no topo */}
-        <div className="bg-white p-3 rounded-lg shadow border">
-          <h3 className="text-xs font-medium text-gray-600 mb-1">Saldo Atual</h3>
-          <p className="text-lg font-bold text-gray-900">
-            {formatCurrency(summaryData.currentBalance)}
-          </p>
-        </div>
-
-        {/* Receitas e Despesas - Cards lado a lado */}
-        <div className="flex space-x-2">
-          {/* Receitas */}
-          <div className="bg-white p-3 rounded-lg shadow border flex-1">
-            <h3 className="text-xs font-medium text-gray-600 mb-1">Receitas</h3>
-            <p className="text-base font-bold text-gray-900">
-              {formatCurrency(summaryData.currentMonthRevenue)}
-            </p>
+      <div className="lg:hidden space-y-3">
+        {/* Saldo Atual - Card principal com contraste reduzido */}
+        <div className="bg-white p-4 rounded-xl shadow-lg border-2 border-gray-200">
+          <div className="text-center">
+            <h3 className="text-sm font-medium text-gray-600 mb-2">Saldo Atual</h3>
+            <div className="flex items-center justify-center space-x-2">
+              <p className={`text-3xl font-black ${
+                summaryData.currentBalance >= 0 ? 'text-green-700' : 'text-red-700'
+              }`}>
+                {summaryData.currentBalance >= 0 ? '+' : ''}{formatCurrency(summaryData.currentBalance)}
+              </p>
+              {summaryData.currentBalance < 0 && (
+                <span className="text-red-600 text-2xl">⚠️</span>
+              )}
+              {summaryData.currentBalance >= 0 && (
+                <span className="text-green-600 text-2xl">📈</span>
+              )}
+            </div>
           </div>
-
-          {/* Despesas */}
-          <div className="bg-white p-3 rounded-lg shadow border flex-1">
-            <h3 className="text-xs font-medium text-gray-600 mb-1">Despesas</h3>
-            <p className="text-base font-bold text-gray-900">
-              {formatCurrency(summaryData.currentMonthExpense)}
-            </p>
+        </div>
+        
+        {/* Receitas e Despesas - Cards com equilíbrio diferenciado */}
+        <div className="flex space-x-3">
+          {/* Receitas - Fundo mais claro */}
+          <div className="bg-gradient-to-br from-green-50 to-white p-4 rounded-xl shadow border-2 border-green-100 flex-1">
+            <div className="text-center mb-3">
+              <h3 className="text-xs font-medium text-green-600 mb-1">Receitas</h3>
+              <div className="flex items-center justify-center space-x-1 mb-2">
+                <span className="text-lg">💰</span>
+              </div>
+              <p className="text-2xl font-black text-green-700">
+                {formatCurrency(summaryData.currentMonthRevenue)}
+              </p>
+            </div>
+            
+            {/* Mini barra de progresso mais grossa */}
+            <div className="mt-3">
+              <div className="w-full bg-gray-200 rounded-full h-2.5">
+                <div 
+                  className="bg-gradient-to-r from-green-400 to-green-500 h-2.5 rounded-full transition-all duration-500" 
+                  style={{ 
+                    width: `${summaryData.currentMonthRevenue > 0 ? 
+                      Math.min((summaryData.currentMonthRevenue / (summaryData.currentMonthRevenue + summaryData.currentMonthExpense)) * 100, 100) : 0}%` 
+                  }}
+                ></div>
+              </div>
+              <p className="text-xs text-gray-600 text-center mt-2 font-medium">
+                {summaryData.currentMonthRevenue > 0 ? 
+                  Math.round((summaryData.currentMonthRevenue / (summaryData.currentMonthRevenue + summaryData.currentMonthExpense)) * 100) : 0}% da movimentação
+              </p>
+            </div>
+          </div>
+          
+          {/* Despesas - Fundo mais forte */}
+          <div className="bg-gradient-to-br from-red-100 to-red-50 p-4 rounded-xl shadow border-2 border-red-200 flex-1">
+            <div className="text-center mb-3">
+              <h3 className="text-xs font-medium text-red-600 mb-1">Despesas</h3>
+              <div className="flex items-center justify-center space-x-1 mb-2">
+                <span className="text-lg">📉</span>
+              </div>
+              <p className="text-2xl font-black text-red-700">
+                {formatCurrency(summaryData.currentMonthExpense)}
+              </p>
+            </div>
+            
+            {/* Mini barra de progresso mais grossa */}
+            <div className="mt-3">
+              <div className="w-full bg-gray-200 rounded-full h-2.5">
+                <div 
+                  className="bg-gradient-to-r from-red-400 to-red-500 h-2.5 rounded-full transition-all duration-500" 
+                  style={{ 
+                    width: `${summaryData.currentMonthExpense > 0 ? 
+                      Math.min((summaryData.currentMonthExpense / (summaryData.currentMonthRevenue + summaryData.currentMonthExpense)) * 100, 100) : 0}%` 
+                  }}
+                ></div>
+              </div>
+              <p className="text-xs text-gray-600 text-center mt-2 font-medium">
+                {summaryData.currentMonthExpense > 0 ? 
+                  Math.round((summaryData.currentMonthExpense / (summaryData.currentMonthRevenue + summaryData.currentMonthExpense)) * 100) : 0}% da movimentação
+              </p>
+            </div>
           </div>
         </div>
       </div>

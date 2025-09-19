@@ -1,56 +1,11 @@
 import { useState, useMemo, useEffect } from 'react'
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line } from 'recharts'
-import React, { CSSProperties } from "react";
-import { scaleTime, scaleLinear, line as d3line, max, area as d3area, curveMonotoneX } from "d3";
 import { useTransactionsContext } from '../contexts/TransactionsContext'
 import { useCategories } from '../hooks/useCategories'
 import { useAuth } from '../contexts/AuthContext'
+import Lottie from 'lottie-react';
+import { settingsService } from '../firebase/services/settings';
 
-const sales = [
-  { date: "2023-04-30", value: 4 },
-  { date: "2023-05-01", value: 6 },
-  { date: "2023-05-02", value: 8 },
-  { date: "2023-05-03", value: 7 },
-  { date: "2023-05-04", value: 10 },
-  { date: "2023-05-05", value: 12 },
-  { date: "2023-05-06", value: 10.5 },
-  { date: "2023-05-07", value: 6 },
-  { date: "2023-05-08", value: 8 },
-  { date: "2023-05-09", value: 7.5 },
-  { date: "2023-05-10", value: 6 },
-  { date: "2023-05-11", value: 8 },
-  { date: "2023-05-12", value: 9 },
-  { date: "2023-05-13", value: 10 },
-  { date: "2023-05-14", value: 17 },
-  { date: "2023-05-15", value: 14 },
-  { date: "2023-05-16", value: 15 },
-  { date: "2023-05-17", value: 20 },
-  { date: "2023-05-18", value: 18 },
-  { date: "2023-05-19", value: 16 },
-  { date: "2023-05-20", value: 15 },
-  { date: "2023-05-21", value: 16 },
-  { date: "2023-05-22", value: 13 },
-  { date: "2023-05-23", value: 11 },
-  { date: "2023-05-24", value: 11 },
-  { date: "2023-05-25", value: 13 },
-  { date: "2023-05-26", value: 12 },
-  { date: "2023-05-27", value: 9 },
-  { date: "2023-05-28", value: 8 },
-  { date: "2023-05-29", value: 10 },
-  { date: "2023-05-30", value: 11 },
-  { date: "2023-05-31", value: 8 },
-  { date: "2023-06-01", value: 9 },
-  { date: "2023-06-02", value: 10 },
-  { date: "2023-06-03", value: 12 },
-  { date: "2023-06-04", value: 13 },
-  { date: "2023-06-05", value: 15 },
-  { date: "2023-06-06", value: 13.5 },
-  { date: "2023-06-07", value: 13 },
-  { date: "2023-06-08", value: 13 },
-  { date: "2023-06-09", value: 14 },
-  { date: "2023-06-10", value: 13 },
-  { date: "2023-06-11", value: 12.5 },
-];
+
 let data = sales.map((d) => ({ ...d, date: new Date(d.date) }));
 
 export function AreaChartSemiFilled() {
@@ -63,9 +18,33 @@ export function AreaChartSemiFilled() {
   const [currentPage, setCurrentPage] = useState(1)
   const [mobilePage, setMobilePage] = useState(1)
   const itemsPerPage = 5
+
   
   // Usar dados reais das transações
   const { transactions, loading } = useTransactionsContext()
+  
+  // Hook para autenticação
+  const { user } = useAuth()
+  
+  // Carregar meta mensal do Firebase
+  useEffect(() => {
+    const loadMonthlyGoal = async () => {
+      if (user?.uid) {
+        try {
+          const settings = await settingsService.getSettings(user.uid)
+          if (settings) {
+            setMetaMensal(settings.monthlyGoal)
+            console.log('✅ Meta mensal carregada do Firebase:', settings.monthlyGoal)
+          }
+        } catch (error) {
+          console.warn('⚠️ Erro ao carregar meta mensal do Firebase, usando valor padrão:', error)
+          // Mantém o valor padrão (25000) se não conseguir carregar do Firebase
+        }
+      }
+    }
+
+    loadMonthlyGoal()
+  }, [user?.uid])
   
   // Debug: Log quando o componente renderiza
   console.log('🔄 [Budgets] Componente renderizado com', transactions.length, 'transações')
@@ -201,18 +180,115 @@ export function AreaChartSemiFilled() {
       saldo: item.saldo
     })));
     
-    // Log detalhado para debug
-    if (result.length > 0) {
-      console.log('🔍 [DEBUG] Primeiro item da tabela:', {
-        data: result[0].date,
-        receitas: result[0].receitas,
-        despesas: result[0].despesas,
-        saldo: result[0].saldo,
-        tipo: typeof result[0].saldo
-      });
-    }
     return result
   }, [transactions])
+
+  // Função para renderizar a movimentação diária no mobile
+  const renderMobileDailyMovement = () => {
+    const mobileItemsPerPage = 4
+    const mobileStartIndex = (mobilePage - 1) * mobileItemsPerPage
+    const mobileEndIndex = mobileStartIndex + mobileItemsPerPage
+    const mobileData = dailyMovementData.slice(mobileStartIndex, mobileEndIndex)
+
+    return (
+      <div className="bg-white rounded-xl border-0 lg:border border-gray-200 overflow-hidden">
+        <div className="px-4 lg:px-6 py-4 lg:py-5 border-b border-gray-200 bg-gradient-to-r from-gray-50 to-gray-100">
+          <h3 className="text-xl lg:text-2xl font-bold text-gray-900 mb-1">Movimentação Diária</h3>
+          <p className="text-xs text-gray-500">Últimos 7 dias de movimentação</p>
+        </div>
+        
+        {/* Mobile Layout */}
+        <div className="lg:hidden">
+          {mobileData.length > 0 ? (
+            mobileData.map((item, index) => {
+              const isPositive = item.saldo >= 0
+              const borderColor = isPositive ? 'border-l-green-500' : 'border-l-red-500'
+              const iconBg = isPositive ? 'bg-green-100' : 'bg-red-100'
+              const iconText = isPositive ? 'text-green-600' : 'text-red-600'
+              const icon = isPositive ? '↗️' : '↘️'
+              const statusBg = isPositive ? 'bg-green-100' : 'bg-red-100'
+              const statusText = isPositive ? 'text-green-700' : 'text-red-700'
+              const statusLabel = isPositive ? 'Positivo' : 'Negativo'
+              const saldoColor = isPositive ? 'text-green-600' : 'text-red-600'
+              
+              return (
+                <div key={index} className={`mb-3 p-4 rounded-xl border-2 shadow-sm transition-all duration-200 hover:shadow-md bg-white border-l-4 ${borderColor}`}>
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center space-x-3">
+                      <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${iconBg}`}>
+                        <span className={`text-sm ${iconText}`}>{icon}</span>
+                      </div>
+                      <div>
+                        <h4 className="text-lg font-bold text-gray-900">{item.date}</h4>
+                        <p className="text-xs text-gray-500">{new Date(item.date).toLocaleDateString('pt-BR', { weekday: 'long' })}</p>
+                      </div>
+                    </div>
+                    <span className={`inline-flex items-center px-2 py-1 text-xs font-medium rounded-full ${statusBg} ${statusText}`}>{statusLabel}</span>
+                  </div>
+                  <div className="text-center mb-4">
+                    <div className={`text-3xl font-black ${saldoColor}`}>R$ {item.saldo.toFixed(2).replace('.', ',')}</div>
+                    <p className="text-xs text-gray-500 mt-1">Saldo do dia</p>
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="text-center p-3 bg-gray-50 rounded-lg">
+                      <div className="flex items-center justify-center space-x-1 mb-1">
+                        <span className="text-green-600 text-sm">💰</span>
+                        <span className="text-xs font-medium text-gray-600">Receitas</span>
+                      </div>
+                      <div className="text-sm font-semibold text-green-600">R$ {item.receitas.toFixed(2).replace('.', ',')}</div>
+                    </div>
+                    <div className="text-center p-3 bg-gray-50 rounded-lg">
+                      <div className="flex items-center justify-center space-x-1 mb-1">
+                        <span className="text-red-600 text-sm">💸</span>
+                        <span className="text-xs font-medium text-gray-600">Despesas</span>
+                      </div>
+                      <div className="text-sm font-semibold text-red-600">R$ {item.despesas.toFixed(2).replace('.', ',')}</div>
+                    </div>
+                  </div>
+                </div>
+              )
+            })
+          ) : (
+            <div className="p-8 text-center text-gray-500">
+              <div className="text-4xl mb-2">📊</div>
+              <p className="text-base">Nenhuma movimentação encontrada</p>
+              <p className="text-sm mt-1">Adicione transações para ver a movimentação diária</p>
+            </div>
+          )}
+          
+          {/* Paginação Mobile */}
+          {dailyMovementData.length > mobileItemsPerPage && (
+            <div className="px-2 py-3 border-t border-gray-200">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                <div className="text-xs text-gray-500">
+                  Mostrando {mobileStartIndex + 1} a {Math.min(mobileEndIndex, dailyMovementData.length)} de {dailyMovementData.length} transações
+                </div>
+                <div className="flex space-x-1">
+                  <button
+                    onClick={() => setMobilePage(Math.max(1, mobilePage - 1))}
+                    disabled={mobilePage === 1}
+                    className="px-2 py-1 text-xs rounded-md bg-gray-100 text-gray-400 cursor-not-allowed disabled:opacity-50"
+                  >
+                    Anterior
+                  </button>
+                  <button className="px-2 py-1 text-xs rounded-md bg-blue-600 text-white">
+                    {mobilePage}
+                  </button>
+                  <button
+                    onClick={() => setMobilePage(Math.min(Math.ceil(dailyMovementData.length / mobileItemsPerPage), mobilePage + 1))}
+                    disabled={mobilePage >= Math.ceil(dailyMovementData.length / mobileItemsPerPage)}
+                    className="px-2 py-1 text-xs rounded-md bg-white text-gray-700 hover:bg-gray-50 border border-gray-300 disabled:opacity-50"
+                  >
+                    Próximo
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    )
+  }
 
   // Calcular totais do mês atual
   const currentMonth = new Date().getMonth()
@@ -284,12 +360,24 @@ export function AreaChartSemiFilled() {
     setNovaMeta(metaMensal.toString())
   }
   
-  const handleSaveMeta = () => {
+  const handleSaveMeta = async () => {
     const valor = parseFloat(novaMeta.replace(/[^\d,]/g, '').replace(',', '.'))
     if (!isNaN(valor) && valor > 0) {
-      setMetaMensal(valor)
-      setIsEditingMeta(false)
-      setNovaMeta('')
+      try {
+        if (user?.uid) {
+          await settingsService.saveMonthlyGoal(user.uid, valor)
+          console.log('✅ Meta mensal salva no Firebase:', valor)
+        }
+        setMetaMensal(valor)
+        setIsEditingMeta(false)
+        setNovaMeta('')
+      } catch (error) {
+        console.warn('⚠️ Erro ao salvar meta mensal no Firebase, salvando localmente:', error)
+        // Ainda atualiza o estado local mesmo se der erro no Firebase
+        setMetaMensal(valor)
+        setIsEditingMeta(false)
+        setNovaMeta('')
+      }
     }
   }
   
@@ -332,141 +420,6 @@ export function AreaChartSemiFilled() {
 
   return (
     <div className="space-y-6">
-      {/* 1. Indicadores de Performance */}
-      {/* Mobile: Carrossel horizontal com duas linhas */}
-      <div className="lg:hidden space-y-3">
-        {/* Linha superior: Meta Mensal */}
-        <div className="overflow-x-auto scrollbar-hide mobile-carousel mobile-carousel-container">
-          <div className="flex space-x-3 pb-2" style={{ width: 'max-content' }}>
-            <div className="bg-white p-4 rounded-xl border-0 border-gray-200 flex-shrink-0 mobile-carousel-item" style={{ minWidth: '280px' }}>
-              <div className="flex items-center">
-                <div className="flex-shrink-0">
-                  <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
-                    <span className="text-blue-600 text-lg">🎯</span>
-                  </div>
-                </div>
-                <div className="ml-4 flex-1">
-                  <div className="flex items-center justify-between">
-                    <p className="text-sm font-medium text-gray-500">Meta Mensal</p>
-                    {!isEditingMeta && (
-                      <button
-                        onClick={handleEditMeta}
-                        className="text-blue-600 hover:text-blue-800 text-xs font-medium"
-                      >
-                        Editar
-                      </button>
-                    )}
-                  </div>
-
-                  {isEditingMeta ? (
-                    <div className="space-y-2">
-                      <div className="flex items-center space-x-2">
-                        <span className="text-sm text-gray-500">R$</span>
-                        <input
-                          type="text"
-                          value={novaMeta}
-                          onChange={(e) => setNovaMeta(e.target.value)}
-                          className="text-lg font-semibold text-gray-900 border border-gray-300 rounded px-2 py-1 w-24"
-                          placeholder="25000"
-                          autoFocus
-                        />
-                      </div>
-                      <div className="flex space-x-2">
-                        <button
-                          onClick={handleSaveMeta}
-                          className="bg-blue-600 text-white text-xs px-3 py-1 rounded hover:bg-blue-700"
-                        >
-                          Salvar
-                        </button>
-                        <button
-                          onClick={handleCancelEdit}
-                          className="bg-gray-300 text-gray-700 text-xs px-3 py-1 rounded hover:bg-gray-400"
-                        >
-                          Cancelar
-                        </button>
-                      </div>
-                    </div>
-                  ) : (
-                    <>
-                      <p className="text-lg font-semibold text-gray-900">
-                        R$ {totalReceitas.toLocaleString('pt-BR')} / R$ {metaMensal.toLocaleString('pt-BR')}
-                      </p>
-                      <div className="w-full bg-gray-200 rounded-full h-2 mt-2">
-                        <div 
-                          className={`h-2 rounded-full ${
-                            (totalReceitas / metaMensal) * 100 < 33 
-                              ? 'bg-yellow-500' 
-                              : (totalReceitas / metaMensal) * 100 < 66 
-                              ? 'bg-blue-600' 
-                              : 'bg-green-500'
-                          }`}
-                          style={{width: `${Math.min((totalReceitas / metaMensal) * 100, 100)}%`}}
-                        ></div>
-                      </div>
-                      <p className="text-xs text-gray-500 mt-1">
-                        {Math.round((totalReceitas / metaMensal) * 100)}% concluído
-                      </p>
-                    </>
-                  )}
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Linha inferior: Dias Restantes, Média Diária, Tendência */}
-        <div className="overflow-x-auto scrollbar-hide mobile-carousel mobile-carousel-container">
-          <div className="flex space-x-3 pb-2" style={{ width: 'max-content' }}>
-            {/* Dias Restantes */}
-            <div className="bg-white p-4 rounded-xl border-0 border-gray-200 flex-shrink-0 mobile-carousel-item" style={{ minWidth: '180px' }}>
-              <div className="flex items-center">
-                <div className="flex-shrink-0">
-                  <div className="w-8 h-8 bg-orange-100 rounded-lg flex items-center justify-center">
-                    <span className="text-orange-600 text-lg">📅</span>
-                  </div>
-                </div>
-                <div className="ml-4">
-                  <p className="text-sm font-medium text-gray-500">Dias Restantes</p>
-                  <p className="text-lg font-semibold text-gray-900">{daysRemaining} dias</p>
-                  <p className="text-xs text-gray-500">até o fim do mês</p>
-                </div>
-              </div>
-            </div>
-
-            {/* Média Diária */}
-            <div className="bg-white p-4 rounded-xl border-0 border-gray-200 flex-shrink-0 mobile-carousel-item" style={{ minWidth: '180px' }}>
-              <div className="flex items-center">
-                <div className="flex-shrink-0">
-                  <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
-                    <span className="text-green-600 text-lg">📊</span>
-                  </div>
-                </div>
-                <div className="ml-4">
-                  <p className="text-sm font-medium text-gray-500">Média Diária</p>
-                  <p className="text-lg font-semibold text-gray-900">R$ {dailyAverageNeeded.toLocaleString('pt-BR')}</p>
-                  <p className="text-xs text-gray-500">necessária para meta</p>
-                </div>
-              </div>
-            </div>
-
-            {/* Tendência */}
-            <div className="bg-white p-4 rounded-xl border-0 border-gray-200 flex-shrink-0 mobile-carousel-item" style={{ minWidth: '180px' }}>
-              <div className="flex items-center">
-                <div className="flex-shrink-0">
-                  <div className="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center">
-                    <span className="text-purple-600 text-lg">📈</span>
-                  </div>
-                </div>
-                <div className="ml-4">
-                  <p className="text-sm font-medium text-gray-500">Tendência</p>
-                  <p className="text-lg font-semibold text-green-600">↗️ Crescendo</p>
-                  <p className="text-xs text-gray-500">+15% vs mês anterior</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
 
       {/* Desktop: Grid original */}
       <div className="hidden lg:grid grid-cols-4 gap-4">
@@ -592,9 +545,9 @@ export function AreaChartSemiFilled() {
 
       {/* 2. Tabela de Movimentação Diária */}
       <div className="bg-white rounded-xl border-0 lg:border border-gray-200 overflow-hidden">
-        <div className="px-2 lg:px-6 py-3 lg:py-4 border-b border-gray-200">
-          <h3 className="text-base lg:text-lg font-semibold text-gray-900">Movimentação Diária</h3>
-          <p className="text-xs lg:text-sm text-gray-500">Últimos 7 dias de movimentação</p>
+        <div className="px-4 lg:px-6 py-4 lg:py-5 border-b border-gray-200 bg-gradient-to-r from-gray-50 to-gray-100">
+          <h3 className="text-xl lg:text-2xl font-bold text-gray-900 mb-1">Movimentação Diária</h3>
+          <p className="text-xs text-gray-500">Últimos 7 dias de movimentação</p>
         </div>
         
         {/* Mobile Layout */}
@@ -610,40 +563,70 @@ export function AreaChartSemiFilled() {
             const localDate = new Date(year, month - 1, day)
             
             return (
-              <div key={index} className={`p-2 lg:p-3 border-t-2 border-b border-gray-200 last:border-b-0 ${
-                item.saldo >= 0 ? 'border-t-green-400' : 'border-t-red-400'
+              <div key={index} className={`mb-3 p-4 rounded-xl border-2 shadow-sm transition-all duration-200 hover:shadow-md bg-white ${
+                item.saldo >= 0 
+                  ? 'border-l-4 border-l-green-500' 
+                  : 'border-l-4 border-l-red-500'
               }`}>
-                <div className="flex items-center justify-between mb-3">
-                  <span className="text-sm font-semibold text-gray-900">
-                    {localDate.toLocaleDateString('pt-BR')}
-                  </span>
-                  <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                {/* Cabeçalho: Data + Status */}
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center space-x-3">
+                    <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${
+                      item.saldo >= 0 ? 'bg-green-100' : 'bg-red-100'
+                    }`}>
+                      <span className={`text-sm ${
+                        item.saldo >= 0 ? 'text-green-600' : 'text-red-600'
+                      }`}>
+                        {item.saldo >= 0 ? '↗️' : '↘️'}
+                      </span>
+                    </div>
+                    <div>
+                      <h4 className="text-lg font-bold text-gray-900">
+                        {localDate.toLocaleDateString('pt-BR')}
+                      </h4>
+                      <p className="text-xs text-gray-500">
+                        {localDate.toLocaleDateString('pt-BR', { weekday: 'long' })}
+                      </p>
+                    </div>
+                  </div>
+                  <span className={`inline-flex items-center px-2 py-1 text-xs font-medium rounded-full ${
                     item.saldo >= 0 
-                      ? 'bg-green-100 text-green-800' 
-                      : 'bg-red-100 text-red-800'
+                      ? 'bg-green-100 text-green-700' 
+                      : 'bg-red-100 text-red-700'
                   }`}>
                     {item.saldo >= 0 ? 'Positivo' : 'Negativo'}
                   </span>
                 </div>
                 
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs text-gray-500">Receitas</span>
-                    <span className="text-sm font-medium text-green-600">
+                {/* Saldo em Destaque */}
+                <div className="text-center mb-4">
+                  <div className={`text-3xl font-black ${
+                    item.saldo >= 0 ? 'text-green-600' : 'text-red-600'
+                  }`}>
+                    R$ {item.saldo.toLocaleString('pt-BR')}
+                  </div>
+                  <p className="text-xs text-gray-500 mt-1">Saldo do dia</p>
+                </div>
+                
+                {/* Receitas e Despesas em Colunas */}
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="text-center p-3 bg-gray-50 rounded-lg">
+                    <div className="flex items-center justify-center space-x-1 mb-1">
+                      <span className="text-green-600 text-sm">💰</span>
+                      <span className="text-xs font-medium text-gray-600">Receitas</span>
+                    </div>
+                    <div className="text-sm font-semibold text-green-600">
                       R$ {item.receitas.toLocaleString('pt-BR')}
-                    </span>
+                    </div>
                   </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs text-gray-500">Despesas</span>
-                    <span className="text-sm font-medium text-red-600">
+                  <div className="text-center p-3 bg-gray-50 rounded-lg">
+                    <div className="flex items-center justify-center space-x-1 mb-1">
+                      <span className="text-red-600 text-sm">💸</span>
+                      <span className="text-xs font-medium text-gray-600">Despesas</span>
+                    </div>
+                    <div className="text-sm font-semibold text-red-600">
                       R$ {item.despesas.toLocaleString('pt-BR')}
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between pt-2 border-t border-gray-100">
-                    <span className="text-xs font-medium text-gray-700">Saldo</span>
-                    <span className={`text-sm font-semibold ${item.saldo >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                      R$ {item.saldo.toLocaleString('pt-BR')}
-                    </span>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -950,10 +933,9 @@ function BarChartThinBreakdown({ data }: { data: any[] }) {
 
 
 const Budgets = () => {
-  try {
-    const [activeReport, setActiveReport] = useState('cashflow')
-    const [viewMode, setViewMode] = useState('table')
-    const [isFiltersModalOpen, setIsFiltersModalOpen] = useState(false)
+  const [activeReport, setActiveReport] = useState('cashflow')
+  const [viewMode, setViewMode] = useState('table')
+  const [isFiltersModalOpen, setIsFiltersModalOpen] = useState(false)
 
   // Estados dos filtros
   const [periodFilter, setPeriodFilter] = useState('este-mes')
@@ -966,12 +948,108 @@ const Budgets = () => {
   const [isEditingMeta, setIsEditingMeta] = useState(false)
   const [novaMeta, setNovaMeta] = useState('')
   
+  // Estado para animação do troféu
+  const [trophyAnimation, setTrophyAnimation] = useState(null)
+  
+  // Estados para paginação da tabela
+  const [currentPage, setCurrentPage] = useState(1)
+  const [mobilePage, setMobilePage] = useState(1)
+  const itemsPerPage = 5
+  
   // Hook do contexto para transações
   const { transactions, loading: transactionsLoading, error: transactionsError } = useTransactionsContext()
+  
+  // Processar dados para a TABELA "Movimentação Diária" (filtrando TODAS as transações pagas)
+  const dailyMovementData = useMemo(() => {
+    if (!transactions || transactions.length === 0) {
+      return []
+    }
+
+    // Filtrar APENAS transações NÃO PAGAS para a tabela
+    const unpaidTransactions = transactions.filter(transaction => {
+      return transaction.isPaid !== true;
+    });
+
+    // Agrupar APENAS transações NÃO PAGAS por data
+    const transactionsByDate = unpaidTransactions.reduce((acc, transaction) => {
+      // Verificar se a transação tem uma data válida
+      if (!transaction || !transaction.date) {
+        return acc;
+      }
+      
+      
+      // Usar a data local para evitar problemas de fuso horário
+      const transactionDate = new Date(transaction.date)
+      const year = transactionDate.getFullYear()
+      const month = String(transactionDate.getMonth() + 1).padStart(2, '0')
+      const day = String(transactionDate.getDate()).padStart(2, '0')
+      const date = `${year}-${month}-${day}`
+      
+      if (!acc[date]) {
+        acc[date] = { receitas: 0, despesas: 0 }
+      }
+      
+      if (transaction.type === 'receita') {
+        acc[date].receitas += transaction.amount
+      } else if (transaction.type === 'despesa') {
+        acc[date].despesas += transaction.amount
+      }
+      
+      return acc
+    }, {})
+
+    // Converter para array e calcular saldo
+    const result = Object.entries(transactionsByDate)
+      .map(([date, values]) => ({
+        date,
+        receitas: values.receitas,
+        despesas: values.despesas,
+        saldo: values.receitas - values.despesas
+      }))
+      .sort((a, b) => new Date(b.date) - new Date(a.date)) // Ordenar por data decrescente
+      .slice(0, 7) // Pegar apenas os últimos 7 dias
+
+    // Debug: Log do primeiro item para verificar
+    if (result.length > 0) {
+      console.log('🔍 [DEBUG] Primeiro item da tabela:', {
+        data: result[0].date,
+        receitas: result[0].receitas,
+        despesas: result[0].despesas,
+        saldo: result[0].saldo,
+        tipo: typeof result[0].saldo
+      });
+    }
+    return result
+  }, [transactions])
+  
+  // Função para mudar página mobile
+  const handleMobilePageChange = (page: number) => {
+    setMobilePage(page)
+  }
   
   // Hook para categorias
   const { user } = useAuth()
   const { categories } = useCategories(user?.uid || 'test-user-123')
+
+  // Carregar meta mensal do Firebase
+  useEffect(() => {
+    const loadMonthlyGoal = async () => {
+      if (user?.uid) {
+        try {
+          const settings = await settingsService.getSettings(user.uid)
+          if (settings) {
+            setMetaMensal(settings.monthlyGoal)
+            console.log('✅ Meta mensal carregada do Firebase:', settings.monthlyGoal)
+          }
+        } catch (error) {
+          console.warn('⚠️ Erro ao carregar meta mensal do Firebase, usando valor padrão:', error)
+          // Mantém o valor padrão (25000) se não conseguir carregar do Firebase
+        }
+      }
+    }
+
+    loadMonthlyGoal()
+  }, [user?.uid])
 
   // Calcular totais do mês atual
   const currentMonth = new Date().getMonth()
@@ -1012,12 +1090,24 @@ const Budgets = () => {
     setNovaMeta(metaMensal.toString())
   }
   
-  const handleSaveMeta = () => {
+  const handleSaveMeta = async () => {
     const valor = parseFloat(novaMeta.replace(/[^\d,]/g, '').replace(',', '.'))
     if (!isNaN(valor) && valor > 0) {
-      setMetaMensal(valor)
-      setIsEditingMeta(false)
-      setNovaMeta('')
+      try {
+        if (user?.uid) {
+          await settingsService.saveMonthlyGoal(user.uid, valor)
+          console.log('✅ Meta mensal salva no Firebase:', valor)
+        }
+        setMetaMensal(valor)
+        setIsEditingMeta(false)
+        setNovaMeta('')
+      } catch (error) {
+        console.warn('⚠️ Erro ao salvar meta mensal no Firebase, salvando localmente:', error)
+        // Ainda atualiza o estado local mesmo se der erro no Firebase
+        setMetaMensal(valor)
+        setIsEditingMeta(false)
+        setNovaMeta('')
+      }
     }
   }
   
@@ -1170,6 +1260,15 @@ const Budgets = () => {
       document.removeEventListener('mousedown', handleClickOutside)
     }
   }, [isFiltersModalOpen])
+
+  // Carregar animação do troféu
+  useEffect(() => {
+    fetch('/Trophy.json')
+      .then(response => response.json())
+      .then(data => setTrophyAnimation(data))
+      .catch(error => console.error('Erro ao carregar animação do troféu:', error))
+  }, [])
+
 
   // Função para aplicar filtros nas transações
   const filteredTransactions = useMemo(() => {
@@ -1427,6 +1526,235 @@ const Budgets = () => {
     { id: 'expenses', name: 'Análise de Gastos', icon: '💰', active: false }
   ]
 
+  // Relatório de Fluxo de Caixa
+  const renderCashFlowReport = () => (
+    <div className="space-y-4 lg:space-y-6">
+      {/* Mobile: Mostrar apenas Movimentação Diária */}
+      <div className="lg:hidden">
+        <div className="bg-white rounded-xl border-0 lg:border border-gray-200 overflow-hidden">
+          <div className="px-4 lg:px-6 py-4 lg:py-5 border-b border-gray-200 bg-gradient-to-r from-gray-50 to-gray-100">
+            <div className="flex items-center justify-between mb-1">
+              <h3 className="text-xl lg:text-2xl font-bold text-gray-900">Movimentação Diária</h3>
+            </div>
+            <p className="text-xs text-gray-500">Últimos 7 dias de movimentação</p>
+          </div>
+          
+          {/* Mobile Layout */}
+          <div className="lg:hidden">
+            {(() => {
+              const mobileItemsPerPage = 8
+              const mobileStartIndex = 0
+              const mobileEndIndex = mobileItemsPerPage
+              const mobileData = dailyMovementData.slice(mobileStartIndex, mobileEndIndex)
+              
+              return mobileData.length > 0 ? (
+                mobileData.map((item, index) => {
+                  const isPositive = item.saldo >= 0
+                  const borderColor = isPositive ? 'border-l-green-500' : 'border-l-red-500'
+                  const iconBg = isPositive ? 'bg-green-100' : 'bg-red-100'
+                  const iconText = isPositive ? 'text-green-600' : 'text-red-600'
+                  const icon = isPositive ? '↗️' : '↘️'
+                  const statusBg = isPositive ? 'bg-green-100' : 'bg-red-100'
+                  const statusText = isPositive ? 'text-green-700' : 'text-red-700'
+                  const statusLabel = isPositive ? 'Positivo' : 'Negativo'
+                  const saldoColor = isPositive ? 'text-green-600' : 'text-red-600'
+                  
+                  return (
+                    <div key={index} className={`mb-3 p-4 rounded-xl border-2 shadow-sm transition-all duration-200 hover:shadow-md bg-white border-l-4 ${borderColor}`}>
+                      <div className="flex items-center justify-between mb-4">
+                        <div className="flex items-center space-x-3">
+                          <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${iconBg}`}>
+                            <span className={`text-sm ${iconText}`}>{icon}</span>
+                          </div>
+                          <div>
+                            <h4 className="text-lg font-bold text-gray-900">{item.date}</h4>
+                            <p className="text-xs text-gray-500">{new Date(item.date).toLocaleDateString('pt-BR', { weekday: 'long' })}</p>
+                          </div>
+                        </div>
+                        <span className={`inline-flex items-center px-2 py-1 text-xs font-medium rounded-full ${statusBg} ${statusText}`}>{statusLabel}</span>
+                      </div>
+                      <div className="text-center mb-4">
+                        <div className={`text-3xl font-black ${saldoColor}`}>R$ {item.saldo.toFixed(2).replace('.', ',')}</div>
+                        <p className="text-xs text-gray-500 mt-1">Saldo do dia</p>
+                      </div>
+                      <div className="grid grid-cols-2 gap-3">
+                        <div className="text-center p-3 bg-gray-50 rounded-lg">
+                          <div className="flex items-center justify-center space-x-1 mb-1">
+                            <span className="text-green-600 text-sm">💰</span>
+                            <span className="text-xs font-medium text-gray-600">Receitas</span>
+                          </div>
+                          <div className="text-sm font-semibold text-green-600">R$ {item.receitas.toFixed(2).replace('.', ',')}</div>
+                        </div>
+                        <div className="text-center p-3 bg-gray-50 rounded-lg">
+                          <div className="flex items-center justify-center space-x-1 mb-1">
+                            <span className="text-red-600 text-sm">💸</span>
+                            <span className="text-xs font-medium text-gray-600">Despesas</span>
+                          </div>
+                          <div className="text-sm font-semibold text-red-600">R$ {item.despesas.toFixed(2).replace('.', ',')}</div>
+                        </div>
+                      </div>
+                    </div>
+                  )
+                })
+              ) : (
+                <div className="p-8 text-center text-gray-500">
+                  <div className="text-4xl mb-2">📊</div>
+                  <p className="text-base">Nenhuma movimentação encontrada</p>
+                  <p className="text-sm mt-1">Adicione transações para ver a movimentação diária</p>
+                </div>
+              )
+            })()}
+            
+            {/* Botão Mostrar Mais Mobile */}
+            {dailyMovementData.length > 8 && (
+              <div className="px-4 py-3 border-t border-gray-200">
+                <button 
+                  className="w-full px-4 py-2 text-sm font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors duration-200"
+                  onClick={() => {
+                    // Aqui você pode implementar a lógica para mostrar mais itens
+                    // Por exemplo, aumentar o limite de itens mostrados
+                    console.log('Mostrar mais transações')
+                  }}
+                >
+                  Mostrar mais
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Desktop: Layout original */}
+      <div className="hidden lg:block">
+        {/* Título e Botões */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-3 lg:mb-4 gap-3 lg:gap-0">
+          <h2 className="text-lg lg:text-xl font-bold text-gray-900">
+            Fluxo de Caixa - {getPeriodName()}
+          </h2>
+          <div className="flex space-x-1 lg:space-x-2">
+            <button
+              onClick={() => setViewMode('chart')}
+              className={`px-3 lg:px-4 py-2 lg:py-2.5 rounded-lg text-sm lg:text-sm font-semibold transition-all duration-300 transform hover:scale-105 ${
+                viewMode === 'chart'
+                  ? 'bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-lg scale-105'
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200 hover:shadow-md'
+              }`}
+            >
+              📊 Gráfico
+            </button>
+            <button
+              onClick={() => setViewMode('table')}
+              className={`px-3 lg:px-4 py-2 lg:py-2.5 rounded-lg text-sm lg:text-sm font-semibold transition-all duration-300 transform hover:scale-105 ${
+                viewMode === 'table'
+                  ? 'bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-lg scale-105'
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200 hover:shadow-md'
+              }`}
+            >
+              📋 Tabela
+            </button>
+          </div>
+        </div>
+
+        {/* Conteúdo baseado no modo de visualização */}
+        {viewMode === 'chart' ? (
+          <div className="space-y-6">
+            {/* Gráfico de Barras */}
+            <div className="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm">
+              <div className="px-4 lg:px-6 py-4 lg:py-5 border-b border-gray-200 bg-gradient-to-r from-gray-50 to-gray-100">
+                <h3 className="text-lg lg:text-xl font-bold text-gray-900">Movimentação Diária</h3>
+                <p className="text-sm text-gray-600 mt-1">Receitas e despesas por dia</p>
+              </div>
+              <div className="p-4 lg:p-6">
+                <BarChart data={dailyMovementData} />
+              </div>
+            </div>
+
+            {/* Gráfico de Linha - Saldo Acumulado */}
+            <div className="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm">
+              <div className="px-4 lg:px-6 py-4 lg:py-5 border-b border-gray-200 bg-gradient-to-r from-gray-50 to-gray-100">
+                <h3 className="text-lg lg:text-xl font-bold text-gray-900">Saldo Acumulado</h3>
+                <p className="text-sm text-gray-600 mt-1">Evolução do saldo ao longo do tempo</p>
+              </div>
+              <div className="p-4 lg:p-6">
+                <LineChart data={dailyMovementData} />
+              </div>
+            </div>
+          </div>
+        ) : (
+          <div className="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm">
+            <div className="px-4 lg:px-6 py-4 lg:py-5 border-b border-gray-200 bg-gradient-to-r from-gray-50 to-gray-100">
+              <h3 className="text-lg lg:text-xl font-bold text-gray-900">Movimentação Diária</h3>
+              <p className="text-sm text-gray-600 mt-1">Últimos 7 dias de movimentação</p>
+            </div>
+            
+            {/* Tabela Desktop */}
+            <div className="overflow-x-auto">
+              <table className="min-w-full divide-y divide-gray-200">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="px-3 lg:px-6 py-2 lg:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Data</th>
+                    <th className="px-3 lg:px-6 py-2 lg:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Receitas</th>
+                    <th className="px-3 lg:px-6 py-2 lg:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Despesas</th>
+                    <th className="px-3 lg:px-6 py-2 lg:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Saldo</th>
+                    <th className="px-3 lg:px-6 py-2 lg:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                  </tr>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {dailyMovementData.map((item, index) => {
+                    // Criar data local para evitar problemas de fuso horário
+                    const [year, month, day] = item.date.split('-').map(Number)
+                    const localDate = new Date(year, month - 1, day)
+                    
+                    
+                    const isPositive = item.saldo >= 0
+                    const borderColor = isPositive ? 'border-l-green-500' : 'border-l-red-500'
+                    const iconBg = isPositive ? 'bg-green-100' : 'bg-red-100'
+                    const iconText = isPositive ? 'text-green-600' : 'text-red-600'
+                    const icon = isPositive ? '↗️' : '↘️'
+                    const statusBg = isPositive ? 'bg-green-100' : 'bg-red-100'
+                    const statusText = isPositive ? 'text-green-700' : 'text-red-700'
+                    const statusLabel = isPositive ? 'Positivo' : 'Negativo'
+                    const saldoColor = isPositive ? 'text-green-600' : 'text-red-600'
+                    
+                    return (
+                      <tr key={index} className={`hover:bg-gray-50 transition-colors duration-200 border-l-4 ${borderColor}`}>
+                        <td className="px-3 lg:px-6 py-3 lg:py-4 whitespace-nowrap">
+                          <div className="flex items-center">
+                            <div className={`w-8 h-8 rounded-lg flex items-center justify-center mr-3 ${iconBg}`}>
+                              <span className={`text-sm ${iconText}`}>{icon}</span>
+                            </div>
+                            <div>
+                              <div className="text-sm font-medium text-gray-900">{item.date}</div>
+                              <div className="text-xs text-gray-500">{localDate.toLocaleDateString('pt-BR', { weekday: 'long' })}</div>
+                            </div>
+                          </div>
+                        </td>
+                        <td className="px-3 lg:px-6 py-3 lg:py-4 whitespace-nowrap">
+                          <div className="text-sm font-semibold text-green-600">R$ {item.receitas.toFixed(2).replace('.', ',')}</div>
+                        </td>
+                        <td className="px-3 lg:px-6 py-3 lg:py-4 whitespace-nowrap">
+                          <div className="text-sm font-semibold text-red-600">R$ {item.despesas.toFixed(2).replace('.', ',')}</div>
+                        </td>
+                        <td className="px-3 lg:px-6 py-3 lg:py-4 whitespace-nowrap">
+                          <div className={`text-lg font-bold ${saldoColor}`}>R$ {item.saldo.toFixed(2).replace('.', ',')}</div>
+                        </td>
+                        <td className="px-3 lg:px-6 py-3 lg:py-4 whitespace-nowrap">
+                          <span className={`inline-flex items-center px-2 py-1 text-xs font-medium rounded-full ${statusBg} ${statusText}`}>
+                            {statusLabel}
+                          </span>
+                        </td>
+                      </tr>
+                    )
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  )
+
   // Função para renderizar o conteúdo do relatório baseado no tipo selecionado
   const renderReportContent = () => {
     switch (activeReport) {
@@ -1441,66 +1769,6 @@ const Budgets = () => {
     }
   }
 
-  // Relatório de Fluxo de Caixa
-  const renderCashFlowReport = () => (
-    <div className="space-y-4 lg:space-y-6">
-          {/* Título e Botões */}
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-3 lg:mb-4 gap-3 lg:gap-0">
-            <h2 className="text-lg lg:text-xl font-bold text-gray-900">
-          Fluxo de Caixa - {getPeriodName()}
-            </h2>
-          <div className="flex space-x-1 lg:space-x-2">
-            <button
-              onClick={() => setViewMode('chart')}
-              className={`px-2 lg:px-4 py-1.5 lg:py-2 rounded-lg text-xs lg:text-sm font-medium transition-colors ${
-                viewMode === 'chart'
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-              }`}
-            >
-              Gráfico
-            </button>
-            <button
-              onClick={() => setViewMode('table')}
-              className={`px-2 lg:px-4 py-1.5 lg:py-2 rounded-lg text-xs lg:text-sm font-medium transition-colors ${
-                viewMode === 'table'
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-              }`}
-            >
-              Tabela
-            </button>
-          </div>
-        </div>
-
-      {/* Conteúdo baseado no modo de visualização */}
-      {viewMode === 'chart' ? (
-          <div className="h-96">
-            {chartData.length > 0 ? (
-              <AreaChartSemiFilled />
-            ) : transactions.length > 0 ? (
-              <div className="flex items-center justify-center h-full">
-                <div className="text-center text-gray-500">
-                  <div className="text-4xl mb-2">📊</div>
-                  <p>Dados insuficientes para o gráfico</p>
-                  <p className="text-sm mt-1">Tente ajustar os filtros ou adicionar mais transações</p>
-                </div>
-              </div>
-            ) : (
-              <div className="flex items-center justify-center h-full">
-                <div className="text-center text-gray-500">
-                  <div className="text-4xl mb-2">📈</div>
-                  <p>Nenhuma transação encontrada</p>
-                  <p className="text-sm mt-1">Adicione transações para ver o fluxo de caixa</p>
-                </div>
-              </div>
-            )}
-          </div>
-        ) : (
-        renderTransactionsTable()
-      )}
-    </div>
-  )
 
   // Função para obter o nome do período baseado no filtro
   const getPeriodName = () => {
@@ -1561,7 +1829,7 @@ const Budgets = () => {
       </div>
 
       {/* Top 5 Maiores Receitas */}
-      <div className="bg-white p-2 lg:p-6 rounded-lg shadow border-0 lg:border">
+      <div className="hidden lg:block bg-white p-2 lg:p-6 rounded-lg shadow border-0 lg:border">
         <h3 className="text-lg font-semibold text-gray-900 mb-4">Top 5 Maiores Receitas</h3>
         <div className="space-y-3">
           {filteredTransactions
@@ -1706,7 +1974,7 @@ const Budgets = () => {
         </div>
 
         {/* Top 5 Maiores Gastos */}
-        <div className="bg-white p-2 lg:p-6 rounded-lg shadow border-0 lg:border">
+        <div className="hidden lg:block bg-white p-2 lg:p-6 rounded-lg shadow border-0 lg:border">
           <h3 className="text-sm lg:text-lg font-semibold text-gray-900 mb-2 lg:mb-4">Top 5 Maiores Gastos</h3>
           <div className="space-y-2 lg:space-y-3">
             {expenses
@@ -1738,17 +2006,18 @@ const Budgets = () => {
   }
 
   // Tabela de transações (reutilizada)
-  const renderTransactionsTable = () => (
+  const renderTransactionsTable = () => {
+    return (
             <div className="overflow-x-hidden">
               <table className="w-full">
                 <thead>
-                  <tr className="border-b border-gray-200">
-                    <th className="text-left py-2 lg:py-3 px-2 lg:px-4 font-medium text-gray-700 text-xs lg:text-sm">Data</th>
-                    <th className="text-left py-2 lg:py-3 px-2 lg:px-4 font-medium text-gray-700 text-xs lg:text-sm hidden sm:table-cell">Descrição</th>
-                    <th className="text-left py-2 lg:py-3 px-2 lg:px-4 font-medium text-gray-700 text-xs lg:text-sm">Categoria</th>
-                    <th className="text-left py-2 lg:py-3 px-2 lg:px-4 font-medium text-gray-700 text-xs lg:text-sm hidden md:table-cell">Parcelas</th>
-                    <th className="text-right py-2 lg:py-3 px-2 lg:px-4 font-medium text-gray-700 text-xs lg:text-sm">Valor</th>
-                    <th className="text-right py-2 lg:py-3 px-2 lg:px-4 font-medium text-gray-700 text-xs lg:text-sm hidden lg:table-cell">Tipo</th>
+                  <tr className="border-b border-gray-200 bg-gradient-to-r from-gray-50 to-gray-100">
+                    <th className="text-left py-3 lg:py-4 px-3 lg:px-4 font-bold text-gray-900 text-sm lg:text-base">Data</th>
+                    <th className="text-left py-3 lg:py-4 px-3 lg:px-4 font-bold text-gray-900 text-sm lg:text-base hidden sm:table-cell">Descrição</th>
+                    <th className="text-left py-3 lg:py-4 px-3 lg:px-4 font-bold text-gray-900 text-sm lg:text-base">Categoria</th>
+                    <th className="text-left py-3 lg:py-4 px-3 lg:px-4 font-bold text-gray-900 text-sm lg:text-base hidden md:table-cell">Parcelas</th>
+                    <th className="text-right py-3 lg:py-4 px-3 lg:px-4 font-bold text-gray-900 text-sm lg:text-base">Valor</th>
+                    <th className="text-right py-3 lg:py-4 px-3 lg:px-4 font-bold text-gray-900 text-sm lg:text-base hidden lg:table-cell">Tipo</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -1762,20 +2031,20 @@ const Budgets = () => {
                     filteredTransactions
               .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
                       .map((transaction) => (
-                        <tr key={transaction.id} className="border-b border-gray-100 hover:bg-gray-50 transition-colors">
-                          <td className="py-2 lg:py-4 px-2 lg:px-4 text-xs lg:text-sm text-gray-600">
+                        <tr key={transaction.id} className="border-b border-gray-100 hover:bg-gray-50 transition-colors duration-200">
+                          <td className="py-3 lg:py-4 px-3 lg:px-4 text-sm lg:text-base text-gray-900 font-semibold">
                             {transaction.date ? transaction.date.toLocaleDateString('pt-BR') : 'Data inválida'}
                           </td>
-                          <td className="py-2 lg:py-4 px-2 lg:px-4 text-xs lg:text-sm text-gray-900 font-medium hidden sm:table-cell">
+                          <td className="py-3 lg:py-4 px-3 lg:px-4 text-sm lg:text-base text-gray-700 font-medium hidden sm:table-cell">
                             {transaction.description}
                           </td>
-                          <td className="py-2 lg:py-4 px-2 lg:px-4 text-xs lg:text-sm text-gray-700">
+                          <td className="py-3 lg:py-4 px-3 lg:px-4 text-sm lg:text-base text-gray-700 font-medium">
                             {transaction.category}
                           </td>
-                          <td className="py-2 lg:py-4 px-2 lg:px-4 text-xs lg:text-sm text-gray-700 hidden md:table-cell">
+                          <td className="py-3 lg:py-4 px-3 lg:px-4 text-sm lg:text-base text-gray-700 hidden md:table-cell">
                             {transaction.installments && transaction.installments > 1 ? (
                               <div className="flex flex-col">
-                                <span className="font-medium">
+                                <span className="font-semibold text-gray-900">
                                   {transaction.installmentNumber || 1}/{transaction.installments}
                                 </span>
                                 <span className="text-xs text-gray-500">
@@ -1788,13 +2057,15 @@ const Budgets = () => {
                               </div>
                             )}
                           </td>
-                          <td className="py-2 lg:py-4 px-2 lg:px-4 text-right text-xs lg:text-sm font-semibold">
-                            <span className={transaction.type === 'receita' ? 'text-green-600' : 'text-red-600'}>
+                          <td className="py-3 lg:py-4 px-3 lg:px-4 text-right">
+                            <span className={`text-lg lg:text-xl font-black ${
+                              transaction.type === 'receita' ? 'text-green-600' : 'text-red-600'
+                            }`}>
                               {transaction.type === 'receita' ? '+' : '-'}R$ {transaction.amount.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                             </span>
                           </td>
-                          <td className="py-2 lg:py-4 px-2 lg:px-4 text-right hidden lg:table-cell">
-                            <span className={`inline-flex items-center px-1.5 lg:px-2 py-0.5 lg:py-1 rounded-full text-xs font-medium ${
+                          <td className="py-3 lg:py-4 px-3 lg:px-4 text-right hidden lg:table-cell">
+                            <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-semibold ${
                               transaction.type === 'receita' 
                                 ? 'bg-green-100 text-green-800' 
                                 : 'bg-red-100 text-red-800'
@@ -1808,10 +2079,12 @@ const Budgets = () => {
                 </tbody>
               </table>
             </div>
-  )
+          )
+  }
 
   return (
-    <div className="space-y-3 lg:space-y-6 px-2 lg:px-0">
+    <>
+      <div className="space-y-3 lg:space-y-6 px-2 lg:px-0">
       {/* Cabeçalho */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 lg:gap-0">
         <h1 className="text-xl lg:text-2xl font-bold text-gray-900">Relatórios</h1>
@@ -1822,242 +2095,197 @@ const Budgets = () => {
 
       {/* Mobile Cards - Carrossel */}
       <div className="lg:hidden space-y-3">
-        {/* Primeira linha: Meta Mensal - largura total */}
-        <div className="bg-white p-4 rounded-xl border-0 border-gray-200 mobile-carousel-item">
-          <div className="flex items-center">
-            <div className="flex-shrink-0">
-              <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
-                <span className="text-blue-600 text-lg">🎯</span>
+        {/* Primeira linha: Meta Mensal - KPI Principal */}
+        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl border-2 border-blue-200 mobile-carousel-item shadow-lg overflow-hidden">
+          {/* Cabeçalho */}
+          <div className="p-4 pb-2">
+            <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center space-x-0">
+                <div>
+                  <div className="mb-1 flex items-center space-x-2">
+                    <h3 className="text-base font-bold text-gray-800">Meta Mensal</h3>
+                    {!isEditingMeta && (
+                      <button
+                        onClick={handleEditMeta}
+                        className="text-blue-600 hover:text-blue-800 text-xs font-semibold bg-blue-100 px-2 py-1 rounded-md transition-colors"
+                      >
+                        Editar
+                      </button>
+                    )}
+                  </div>
+                  
+                  {/* Valor Principal e Meta total - Logo abaixo do título */}
+                  <div className="flex items-center space-x-1 mb-3">
+                    <div className="text-sm font-bold text-gray-700">
+                      R$ {totalReceitas.toLocaleString('pt-BR')}
+                    </div>
+                    <div className="text-xs text-gray-600">
+                      /{metaMensal.toLocaleString('pt-BR')}
+                    </div>
+                  </div>
+                  
+                </div>
               </div>
-            </div>
-            <div className="ml-4 flex-1">
-              <div className="flex items-center justify-between">
-                <p className="text-sm font-medium text-gray-500">Meta Mensal</p>
-                {!isEditingMeta && (
-                  <button
-                    onClick={handleEditMeta}
-                    className="text-blue-600 hover:text-blue-800 text-xs font-medium"
-                  >
-                    Editar
-                  </button>
+              {/* Ícone de Troféu */}
+              <div className="w-16 h-16 -ml-6 -mt-2">
+                {trophyAnimation ? (
+                  <Lottie 
+                    animationData={trophyAnimation}
+                    loop={true}
+                    autoplay={true}
+                    style={{ width: '100%', height: '100%' }}
+                  />
+                ) : (
+                  <div className="w-full h-full bg-gradient-to-r from-yellow-400 to-yellow-500 rounded-full flex items-center justify-center">
+                    <span className="text-white text-lg">🏆</span>
+                  </div>
                 )}
               </div>
-
-              {isEditingMeta ? (
-                <div className="space-y-2">
-                  <div className="flex items-center space-x-2">
-                    <span className="text-sm text-gray-500">R$</span>
-                    <input
-                      type="text"
-                      value={novaMeta}
-                      onChange={(e) => setNovaMeta(e.target.value)}
-                      className="text-lg font-semibold text-gray-900 border border-gray-300 rounded px-2 py-1 w-24"
-                      placeholder="25000"
-                      autoFocus
-                    />
-                  </div>
-                  <div className="flex space-x-2">
-                    <button
-                      onClick={handleSaveMeta}
-                      className="bg-blue-600 text-white text-xs px-3 py-1 rounded hover:bg-blue-700"
-                    >
-                      Salvar
-                    </button>
-                    <button
-                      onClick={handleCancelEdit}
-                      className="bg-gray-300 text-gray-700 text-xs px-3 py-1 rounded hover:bg-gray-400"
-                    >
-                      Cancelar
-                    </button>
-                  </div>
+            </div>
+          </div>
+          
+          {/* Barra de Progresso ocupando todo o espaço restante */}
+          <div className="relative w-full bg-gray-200 h-8 shadow-inner overflow-hidden">
+            {/* Barra de progresso animada */}
+            <div 
+              className={`h-8 transition-all duration-2000 ease-out relative overflow-hidden ${
+                (totalReceitas / metaMensal) * 100 < 33 
+                  ? 'bg-gradient-to-r from-yellow-400 via-yellow-300 to-yellow-500' 
+                  : (totalReceitas / metaMensal) * 100 < 66 
+                  ? 'bg-gradient-to-r from-blue-500 via-blue-400 to-blue-600' 
+                  : 'bg-gradient-to-r from-green-500 via-green-400 to-green-600'
+              }`}
+              style={{width: `${Math.min((totalReceitas / metaMensal) * 100, 100)}%`}}
+            >
+              {/* Efeito de brilho animado */}
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent progress-shimmer"></div>
+              
+              {/* Efeito de ondas */}
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent progress-wave"></div>
+              
+              {/* Efeito de partículas flutuantes */}
+              <div className="absolute inset-0 pointer-events-none">
+                <div className="absolute top-1 left-2 w-0.5 h-0.5 bg-white/30 rounded-full progress-float"></div>
+                <div className="absolute top-1 right-4 w-0.5 h-0.5 bg-white/40 rounded-full progress-float animation-delay-1000"></div>
+                <div className="absolute bottom-1 left-6 w-0.5 h-0.5 bg-white/20 rounded-full progress-float animation-delay-2000"></div>
+              </div>
+              
+              {/* Percentual centralizado na barra */}
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="flex items-center space-x-1">
+                  <span className="text-sm font-bold text-white drop-shadow-sm">
+                    {Math.round((totalReceitas / metaMensal) * 100)}%
+                  </span>
+                  <span className="text-xs text-white/90 drop-shadow-sm">concluído</span>
                 </div>
-              ) : (
-                <>
-                  <p className="text-lg font-semibold text-gray-900">
-                    R$ {totalReceitas.toLocaleString('pt-BR')} / R$ {metaMensal.toLocaleString('pt-BR')}
-                  </p>
-                  <div className="w-full bg-gray-200 rounded-full h-2 mt-2">
-                    <div 
-                      className={`h-2 rounded-full ${
-                        (totalReceitas / metaMensal) * 100 < 33 
-                          ? 'bg-yellow-500' 
-                          : (totalReceitas / metaMensal) * 100 < 66 
-                          ? 'bg-blue-600' 
-                          : 'bg-green-500'
-                      }`}
-                      style={{width: `${Math.min((totalReceitas / metaMensal) * 100, 100)}%`}}
-                    ></div>
-                  </div>
-                  <p className="text-xs text-gray-500 mt-1">
-                    {Math.round((totalReceitas / metaMensal) * 100)}% concluído
-                  </p>
-                </>
-              )}
+              </div>
+            </div>
+          </div>
+
+
+          {isEditingMeta ? (
+            <div className="space-y-3 mt-4">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-2 sm:space-y-0 sm:space-x-2">
+                <span className="text-sm sm:text-base font-bold text-gray-700">R$</span>
+                <input
+                  type="text"
+                  value={novaMeta}
+                  onChange={(e) => setNovaMeta(e.target.value)}
+                  className="text-sm sm:text-lg font-bold text-gray-900 border-2 border-blue-300 rounded-md px-3 py-2 w-full sm:w-32 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  placeholder="25000"
+                  autoFocus
+                />
+              </div>
+              <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2">
+                <button
+                  onClick={handleSaveMeta}
+                  className="bg-blue-600 text-white text-sm px-4 py-2 rounded-md hover:bg-blue-700 font-semibold transition-colors w-full sm:w-auto"
+                >
+                  Salvar
+                </button>
+                <button
+                  onClick={handleCancelEdit}
+                  className="bg-gray-300 text-gray-700 text-sm px-4 py-2 rounded-md hover:bg-gray-400 font-semibold transition-colors w-full sm:w-auto"
+                >
+                  Cancelar
+                </button>
+              </div>
+            </div>
+          ) : (
+            <>
+              {/* Informações Secundárias */}
+            </>
+          )}
+        </div>
+        
+        {/* Segunda linha: Cards Secundários - Grid 2x1 */}
+        <div className="grid grid-cols-2 gap-3">
+          {/* Dias Restantes */}
+          <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
+            <div className="text-center">
+              <div className="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center mx-auto mb-2">
+                <span className="text-gray-600 text-sm">📅</span>
+              </div>
+              <p className="text-xs font-medium text-gray-500 mb-1">Dias Restantes</p>
+              <p className="text-2xl font-bold text-orange-600">13</p>
+              <p className="text-xs text-gray-400">até o fim do mês</p>
+            </div>
+          </div>
+          
+          {/* Média Diária */}
+          <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
+            <div className="text-center">
+              <div className="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center mx-auto mb-2">
+                <span className="text-gray-600 text-sm">📊</span>
+              </div>
+              <p className="text-xs font-medium text-gray-500 mb-1">Média Diária</p>
+              <p className="text-2xl font-bold text-green-600">R$ 1.842</p>
+              <p className="text-xs text-gray-400">necessária para meta</p>
             </div>
           </div>
         </div>
         
-        {/* Segunda linha: Dias Restantes, Média Diária e Tendência */}
-        <div className="overflow-x-auto scrollbar-hide mobile-carousel mobile-carousel-container">
-          <div className="flex space-x-3 pb-2" style={{width: 'max-content'}}>
-            <div className="bg-white p-4 rounded-xl border-0 border-gray-200 flex-shrink-0 mobile-carousel-item" style={{minWidth: '180px'}}>
-              <div className="flex items-center">
-                <div className="flex-shrink-0">
-                  <div className="w-8 h-8 bg-orange-100 rounded-lg flex items-center justify-center">
-                    <span className="text-orange-600 text-lg">📅</span>
-                  </div>
-                </div>
-                <div className="ml-4">
-                  <p className="text-sm font-medium text-gray-500">Dias Restantes</p>
-                  <p className="text-lg font-semibold text-gray-900">13 dias</p>
-                  <p className="text-xs text-gray-500">até o fim do mês</p>
-                </div>
-              </div>
+        {/* Terceira linha: Tendência - Largura total */}
+        <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
+          <div className="text-center">
+            <div className="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center mx-auto mb-2">
+              <span className="text-gray-600 text-sm">📈</span>
             </div>
-            
-            <div className="bg-white p-4 rounded-xl border-0 border-gray-200 flex-shrink-0 mobile-carousel-item" style={{minWidth: '180px'}}>
-              <div className="flex items-center">
-                <div className="flex-shrink-0">
-                  <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
-                    <span className="text-green-600 text-lg">📊</span>
-                  </div>
-                </div>
-                <div className="ml-4">
-                  <p className="text-sm font-medium text-gray-500">Média Diária</p>
-                  <p className="text-lg font-semibold text-gray-900">R$ 1.842</p>
-                  <p className="text-xs text-gray-500">necessária para meta</p>
-                </div>
-              </div>
+            <p className="text-xs font-medium text-gray-500 mb-1">Tendência</p>
+            <div className="flex items-center justify-center space-x-2">
+              <p className={`text-xl font-bold ${calculateMonthlyGrowth() >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                {calculateMonthlyGrowth() >= 0 ? '↗️ Crescendo' : '↘️ Decrescendo'}
+              </p>
+              <p className={`text-sm font-semibold ${calculateMonthlyGrowth() >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+                {calculateMonthlyGrowth() >= 0 ? '+' : ''}{calculateMonthlyGrowth().toFixed(1)}%
+              </p>
             </div>
-            
-            <div className="bg-white p-4 rounded-xl border-0 border-gray-200 flex-shrink-0 mobile-carousel-item" style={{minWidth: '180px'}}>
-              <div className="flex items-center">
-                <div className="flex-shrink-0">
-                  <div className="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center">
-                    <span className="text-purple-600 text-lg">📈</span>
-                  </div>
-                </div>
-                <div className="ml-4">
-                  <p className="text-sm font-medium text-gray-500">Tendência</p>
-                  <p className="text-lg font-semibold text-green-600">↗️ Crescendo</p>
-                  <p className="text-xs text-gray-500">+15% vs mês anterior</p>
-                </div>
-              </div>
-            </div>
+            <p className="text-xs text-gray-400">vs mês anterior</p>
           </div>
         </div>
+        
       </div>
 
-      {/* Cards de Resumo */}
       <div className="hidden lg:grid grid-cols-3 gap-6">
-        {(() => {
-          // Calcular dados reais das transações
-          const revenues = transactions.filter(t => t.type === 'receita')
-          const expenses = transactions.filter(t => t.type === 'despesa')
-          
-          const totalRevenue = revenues.reduce((sum, t) => sum + t.amount, 0)
-          const totalExpense = expenses.reduce((sum, t) => sum + t.amount, 0)
-          
-          // Maior receita
-          const biggestRevenue = revenues.length > 0 ? revenues.reduce((max, t) => t.amount > max.amount ? t : max) : null
-          const revenuePercentage = biggestRevenue && totalRevenue > 0 ? ((biggestRevenue.amount / totalRevenue) * 100).toFixed(0) : 0
-          
-          // Maior despesa
-          const biggestExpense = expenses.length > 0 ? expenses.reduce((max, t) => t.amount > max.amount ? t : max) : null
-          const expensePercentage = biggestExpense && totalExpense > 0 ? ((biggestExpense.amount / totalExpense) * 100).toFixed(0) : 0
-          
-          // Calcular economia potencial (reduzir 15% da maior categoria de despesa)
-          const expenseByCategory = expenses.reduce((acc, t) => {
-            acc[t.category] = (acc[t.category] || 0) + t.amount
-            return acc
-          }, {} as Record<string, number>)
-          
-          const biggestCategory = Object.entries(expenseByCategory).length > 0 
-            ? Object.entries(expenseByCategory).reduce((max, [cat, amount]) => amount > max.amount ? { category: cat, amount } : max, { category: '', amount: 0 })
-            : { category: 'alimentação', amount: 0 }
-          
-          const potentialSavings = biggestCategory.amount * 0.15
-          const annualSavings = potentialSavings * 12
-          
-          return (
-            <>
         {/* Maior Receita */}
         <div className="bg-white p-3 lg:p-6 rounded-lg shadow border-0 lg:border">
           <h3 className="text-xs lg:text-lg font-medium text-gray-600 mb-1 lg:mb-4">Maior Receita</h3>
-          <div className="space-y-1 lg:space-y-3">
-                  {biggestRevenue ? (
-                    <>
-            <div className="flex items-center justify-between">
-                        <span className="text-xs lg:text-sm text-gray-600 truncate">{biggestRevenue.description}</span>
-                        <span className="text-sm lg:text-lg font-bold text-green-600">
-                          R$ {biggestRevenue.amount.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-                        </span>
-            </div>
-            <div className="text-xs lg:text-sm text-gray-500 hidden lg:block">
-                        <span className="font-medium text-gray-900">{revenuePercentage}%</span> das receitas
-            </div>
-            <div className="text-xs lg:text-sm text-green-600 hidden lg:block">
-                        {biggestRevenue.category}
-            </div>
-                    </>
-                  ) : (
-                    <div className="text-xs lg:text-sm text-gray-500">Nenhuma receita encontrada</div>
-                  )}
-          </div>
+          <div className="text-xs lg:text-sm text-gray-500">Em desenvolvimento</div>
         </div>
 
         {/* Maior Despesa */}
         <div className="bg-white p-3 lg:p-6 rounded-lg shadow border-0 lg:border">
           <h3 className="text-xs lg:text-lg font-medium text-gray-600 mb-1 lg:mb-4">Maior Despesa</h3>
-          <div className="space-y-1 lg:space-y-3">
-                  {biggestExpense ? (
-                    <>
-            <div className="flex items-center justify-between">
-                        <span className="text-xs lg:text-sm text-gray-600 truncate">{biggestExpense.description}</span>
-                        <span className="text-sm lg:text-lg font-bold text-red-600">
-                          R$ {biggestExpense.amount.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-                        </span>
-            </div>
-            <div className="text-xs lg:text-sm text-gray-500 hidden lg:block">
-                        <span className="font-medium text-gray-900">{expensePercentage}%</span> das despesas
-            </div>
-            <div className="text-xs lg:text-sm text-gray-500 hidden lg:block">
-                        {biggestExpense.category}
-            </div>
-                    </>
-                  ) : (
-                    <div className="text-xs lg:text-sm text-gray-500">Nenhuma despesa encontrada</div>
-                  )}
-          </div>
+          <div className="text-xs lg:text-sm text-gray-500">Em desenvolvimento</div>
         </div>
 
         {/* Economia Potencial */}
         <div className="bg-white p-3 lg:p-6 rounded-lg shadow border-0 lg:border">
           <h3 className="text-xs lg:text-lg font-medium text-gray-600 mb-1 lg:mb-4">Economia Potencial</h3>
-          <div className="space-y-1 lg:space-y-3">
-                  {biggestCategory.amount > 0 ? (
-                    <>
-            <div className="text-xs lg:text-sm text-gray-500 hidden lg:block">
-                        <span className="font-medium text-gray-900">{biggestCategory.category}</span> -15%
-            </div>
-            <div className="text-sm lg:text-lg font-bold text-green-600">
-                        R$ {potentialSavings.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}/mês
-            </div>
-            <div className="text-xs lg:text-sm text-gray-500 hidden lg:block">
-                        R$ {annualSavings.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}/ano
-            </div>
-                    </>
-                  ) : (
-                    <div className="text-xs lg:text-sm text-gray-500">Nenhuma despesa para análise</div>
-                  )}
-          </div>
+          <div className="text-xs lg:text-sm text-gray-500">Em desenvolvimento</div>
         </div>
-            </>
-          )
-        })()}
       </div>
 
-      {/* Controles e Navegação */}
       <div className="space-y-3 lg:space-y-4">
         {/* Navegação Principal - Carrossel Horizontal */}
         <div className="bg-white p-2 lg:p-4 rounded-lg shadow border-0 lg:border">
@@ -2066,33 +2294,32 @@ const Budgets = () => {
             <div className="lg:hidden w-full">
               <div className="flex overflow-x-auto scrollbar-hide space-x-2 pb-2">
                 <div className="flex space-x-2">
-                  {reportTypes.map((report) => (
-                    <button
-                      key={report.id}
-                      onClick={() => setActiveReport(report.id)}
-                      className={`flex items-center space-x-1 px-3 py-2 rounded-full text-xs font-medium transition-all duration-200 whitespace-nowrap ${
-                        activeReport === report.id
-                          ? 'bg-blue-600 text-white shadow-md'
-                          : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                      }`}
-                    >
-                      <span className="text-sm">{report.icon}</span>
-                      <span>{report.name}</span>
-                    </button>
-                  ))}
-                  
                   {/* Botão de Filtros */}
                   <button 
                     onClick={() => setIsFiltersModalOpen(true)}
-                    className="flex items-center space-x-1 px-3 py-2 rounded-full text-xs font-medium transition-all duration-200 bg-gray-100 text-gray-600 hover:bg-gray-200 whitespace-nowrap"
+                    className="flex items-center space-x-2 px-4 py-3 rounded-full text-sm font-semibold transition-all duration-300 bg-gray-100 text-gray-600 hover:bg-gray-200 hover:shadow-md whitespace-nowrap"
                   >
                     <img 
-                      src="/configuration-settings-gear-options-preferences-setting-tools-svgrepo-com.svg" 
+                      src="/options.png" 
                       alt="Filtros" 
                       className="w-3 h-3"
                     />
                     <span>Filtros</span>
                   </button>
+                  
+                  {reportTypes.map((report) => (
+                    <button
+                      key={report.id}
+                      onClick={() => setActiveReport(report.id)}
+                      className={`flex items-center px-4 py-3 rounded-full text-sm font-semibold transition-all duration-300 whitespace-nowrap ${
+                        activeReport === report.id
+                          ? 'bg-blue-600 text-white shadow-xl transform scale-110 border-2 border-blue-700'
+                          : 'bg-gray-50 text-gray-500 hover:bg-gray-100 hover:text-gray-700'
+                      }`}
+                    >
+                      <span>{report.name}</span>
+                    </button>
+                  ))}
                 </div>
               </div>
             </div>
@@ -2100,6 +2327,19 @@ const Budgets = () => {
             {/* Desktop: Layout original */}
             <div className="hidden lg:block">
               <div className="flex flex-wrap gap-1 bg-gray-50 p-1 rounded-lg border">
+                {/* Botão de Filtros */}
+                <button 
+                  onClick={() => setIsFiltersModalOpen(true)}
+                  className="flex items-center space-x-2 px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 text-gray-600 hover:text-gray-900 hover:bg-gray-100"
+                >
+                  <img 
+                    src="/options.png" 
+                    alt="Filtros" 
+                    className="w-4 h-4"
+                  />
+                  <span>Filtros</span>
+                </button>
+                
                 {reportTypes.map((report) => (
                   <button
                     key={report.id}
@@ -2114,19 +2354,6 @@ const Budgets = () => {
                     <span>{report.name}</span>
                   </button>
                 ))}
-                
-                {/* Botão de Filtros */}
-                <button 
-                  onClick={() => setIsFiltersModalOpen(true)}
-                  className="flex items-center space-x-2 px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 text-gray-600 hover:text-gray-900 hover:bg-gray-100"
-                >
-                  <img 
-                    src="/configuration-settings-gear-options-preferences-setting-tools-svgrepo-com.svg" 
-                    alt="Filtros" 
-                    className="w-4 h-4"
-                  />
-                  <span>Filtros</span>
-                </button>
               </div>
             </div>
           </div>
@@ -2134,7 +2361,6 @@ const Budgets = () => {
 
       </div>
 
-      {/* Conteúdo do Relatório */}
       <div className="bg-white p-2 lg:p-6 rounded-lg shadow border-0 lg:border">
         {/* Estados de Loading e Erro */}
         {transactionsLoading ? (
@@ -2164,7 +2390,6 @@ const Budgets = () => {
         )}
       </div>
 
-      {/* Modal de Filtros */}
       {isFiltersModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 modal-backdrop">
           <div className="bg-white rounded-lg shadow-xl max-w-md w-full mx-3 lg:mx-4">
@@ -2306,20 +2531,9 @@ const Budgets = () => {
           </div>
         </div>
       )}
-
-    </div>
-  )
-  } catch (error) {
-    console.error('❌ [Budgets] Erro no componente:', error)
-    return (
-      <div className="bg-white p-2 lg:p-6 rounded-lg shadow border-0 lg:border">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Relatórios</h3>
-        <div className="text-red-600">
-          <p>Erro ao carregar relatórios: {String(error)}</p>
-        </div>
       </div>
-    )
-  }
+    </>
+  )
 }
 
 export default Budgets
